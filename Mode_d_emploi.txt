@@ -120,7 +120,9 @@ télécharger plusieurs fichiers : cliquez sur « Autoriser ».
   cette échéance. À la même date, vos ventes aux particuliers devront
   aussi être déclarées à l'administration (e-reporting), via une
   plateforme agréée. L'Établi ne transmet rien à une plateforme : cette
-  partie reste à faire de votre côté.
+  partie reste à faire de votre côté. Le moment venu, certaines
+  plateformes agréées acceptent vos factures PDF et les transforment en
+  factures électroniques, parfois gratuitement (Indy, par exemple).
 - En France, dépannage chez les particuliers : si vous faites du dépannage, de la
   réparation ou de l'entretien (plomberie, électricité, chauffage...),
   cochez la case prévue dans la configuration, étape des conditions.

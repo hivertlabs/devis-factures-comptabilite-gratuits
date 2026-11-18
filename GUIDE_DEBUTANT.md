@@ -166,6 +166,14 @@ Exemple : vous avez facturé 10 heures au lieu de 8. Vous faites un avoir de 2 h
 
 Indiquez toujours une date limite de paiement. Entre professionnels, la loi limite le délai à 60 jours après la date de facture (ou 45 jours fin de mois si c'est prévu au contrat) ; sans accord particulier, c'est 30 jours après la prestation. Pour un particulier, vous êtes libre, mais une date claire évite les « je pensais avoir le temps ».
 
+### La facture électronique, en France
+
+Depuis le 1er septembre 2026, toute entreprise doit pouvoir *recevoir* des factures électroniques. Une facture électronique n'est pas un PDF envoyé par mail : c'est un fichier structuré, transmis par une plateforme agréée par l'administration.
+
+L'obligation d'en *émettre* arrive pour les petites entreprises et les micro-entrepreneurs le 1er septembre 2027, et seulement pour les factures à des clients professionnels établis en France. Pour vos clients particuliers, la facture PDF reste possible, mais à la même date vos ventes aux particuliers devront être déclarées à l'administration (e-reporting), elles aussi via une plateforme agréée.
+
+L'Établi fait des factures PDF et ne transmet rien à une plateforme. D'ici là, rien ne change pour vous. Le moment venu, certaines plateformes agréées acceptent vos factures PDF et les transforment en factures électroniques, parfois gratuitement (Indy, par exemple).
+
 ---
 
 ## 5. La numérotation : pourquoi elle est si surveillée
