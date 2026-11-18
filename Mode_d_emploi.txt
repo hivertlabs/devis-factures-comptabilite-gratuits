@@ -163,9 +163,10 @@ qui les rend valables face à lui.
   sur iPhone, utilisez le lien du site.
 - Mode sombre : bouton « 🌙 Mode sombre » en haut. L'impression reste
   identique.
-- Modèles par métier : dans la configuration, étape « Tarifs », le bouton
-  « Partir d'un modèle de mon métier » ajoute une dizaine de prestations
-  courantes, prix à zéro. Mettez vos prix.
+- Modèles par métier (facultatif) : dans la configuration, étape « Tarifs »,
+  le bouton « Partir d'un modèle de mon métier » ajoute une dizaine de
+  prestations courantes, prix à zéro. Mettez vos prix. 22 métiers sont
+  proposés ; si le vôtre n'y est pas, saisissez vos propres prestations.
 - Franchise de TVA : le tableau de bord de la compta montre où vous en
   êtes par rapport aux seuils, et vers quelle date vous les atteindriez
   au rythme actuel.

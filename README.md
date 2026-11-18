@@ -33,7 +33,7 @@
 - **Tout enregistrer en un clic** : votre configuration et votre dossier comptable de l'année, deux fichiers aux noms assortis à ranger ensemble.
 - **Agenda** : notez vos interventions (sur un ou plusieurs jours), vos rendez-vous et vos rappels. Depuis un devis, un bouton reprend le client, le lieu et les dates prévues. S'y ajoutent tout seuls les échéances et les relances de vos factures, la fin de validité des devis que vous imprimez et la fin de votre attestation décennale. Un bouton envoie tout vers l'agenda de votre téléphone, d'Outlook ou de Google (fichier .ics), avec un rappel si vous le souhaitez. L'agenda est rangé dans votre fichier de configuration : rien ne part sur internet.
 - **Téléphone et mode sombre** : les écrans s'adaptent au téléphone (et le bouton « Prendre en photo » ouvre directement l'appareil photo pour vos tickets). Le mode sombre se règle d'un clic, l'impression ne change pas.
-- **Modèles par métier** : plomberie, électricité, peinture, maçonnerie, menuiserie, carrelage, couverture, multiservices, nettoyage, espaces verts. Une dizaine de prestations courantes s'ajoutent en un clic à votre catalogue, prix à zéro : vous mettez les vôtres.
+- **Modèles par métier (facultatif)** : 22 métiers du bâtiment, des services à domicile, de l'informatique et du numérique, du conseil, de la rédaction et de la mécanique. Une dizaine de prestations courantes s'ajoutent en un clic à votre catalogue, prix à zéro : vous mettez les vôtres. Votre métier n'y est pas ? Vous saisissez simplement vos propres prestations.
 - **Petites bulles d'aide** sur les points qui posent question.
 
 ## La comptabilité (France)
