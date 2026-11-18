@@ -582,6 +582,131 @@ table.d-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
 /* Bouton du mode sombre */
 .btn-theme { background: #2d333b; color: #fff; }
 html:not(.sombre) .btn-theme { background: #e2e8f0; color: #003366; }
+
+/* ===================== STYLE ÉPURÉ (écran uniquement) =====================
+   Arrondis, ombres douces, filets fins, réactions au survol et au clic.
+   Ne change ni les couleurs de la marque, ni les textes, ni la place des boutons.
+   L'aperçu du devis (#doc) et l'impression ne sont pas touchés. */
+@media screen {
+  :root {
+    --ui-font: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --filet: #e3e9f1;
+    --ombre: 0 1px 2px rgba(15,23,42,.05), 0 8px 24px rgba(15,23,42,.06);
+    --anneau: 0 0 0 3px rgba(0,51,102,.16);
+  }
+  body { font-family: var(--ui-font); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  #doc { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; }
+  .cpt { font-family: var(--ui-font); }
+  .appbar h1, .panel h2, .welcome h2, .cpt h2 { letter-spacing: -0.015em; }
+
+  /* Cadres principaux : plus de gros trait bleu, une carte blanche posée sur le fond */
+  .panel { border: 1px solid var(--filet); border-radius: 18px; box-shadow: var(--ombre); }
+  .panel h3 { border-bottom-color: var(--filet); }
+
+  /* Boutons */
+  .btn, .cpt-btn { border-radius: 10px; font-weight: 600; transition: transform .12s ease, box-shadow .15s ease, filter .15s ease, background-color .15s ease; }
+  .btn:hover, .cpt-btn:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(15,23,42,.16); }
+  .btn:active, .cpt-btn:active { transform: scale(.97); filter: brightness(.96); box-shadow: none; }
+  .btn-light:hover, .cpt-btn.cpt-sec:hover { filter: none; background: #d6dfea; box-shadow: none; }
+  .btn-small { border-radius: 8px; }
+  .btn-big { border-radius: 12px; }
+  .btn:disabled, .cpt-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; filter: none; }
+  .btn-x { border-radius: 8px; transition: filter .15s ease, transform .12s ease; }
+  .btn-x:hover { filter: brightness(1.1); } .btn-x:active { transform: scale(.94); }
+  button:focus-visible, .esp:focus-visible, .tab:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+
+  /* Onglets en pastilles */
+  .tab, .cpt-onglets button { border-radius: 999px; padding-left: 13px; padding-right: 13px; transition: background-color .15s ease, color .15s ease; }
+  .tab:not(.active):hover, .cpt-onglets button:not(.cpt-actif):hover { filter: none; background: #d6dfea; }
+  .cpt-onglets { border-bottom-width: 1px; }
+
+  /* Les trois espaces : un sélecteur segmenté */
+  .espaces { background: #fff; padding: 5px; gap: 4px; border: 1px solid var(--filet); border-radius: 16px; box-shadow: var(--ombre); }
+  .esp { border: none; border-radius: 12px; background: transparent; transition: background-color .15s ease, color .15s ease, box-shadow .15s ease; }
+  .esp:hover { background: #eef3f9; }
+  .esp.active, .esp.active:hover { background: #003366; color: #fff; box-shadow: 0 2px 10px rgba(0,51,102,.28); }
+
+  /* Champs de saisie */
+  .panel input[type=text], .panel input[type=number], .panel input[type=date], .panel input[type=time], .panel input[type=email], .panel select, .panel textarea { border-color: #d3dbe5; border-radius: 10px; transition: border-color .15s ease, box-shadow .15s ease; }
+  .panel input[type=color] { border-radius: 10px; }
+  .cpt input:is([type=text],[type=date],[type=number]):not(.cpt-ocr):not(.cpt-manque):not(.cpt-date-imp), .cpt select:not(.cpt-ocr):not(.cpt-acat):not(.cpt-manque) { border-width: 1px; border-radius: 9px; transition: border-color .15s ease, box-shadow .15s ease; }
+  :is(.panel, .cpt) :is(input, select, textarea):focus:not(.cpt-ocr):not(.cpt-acat):not(.cpt-manque):not(.cpt-date-imp) { outline: none; border-color: #003366; box-shadow: var(--anneau); }
+  input[type=checkbox], input[type=radio] { accent-color: #003366; }
+
+  /* Cartes et encadrés */
+  .step3 { border: 1px solid var(--filet); border-radius: 14px; background: #f7f9fc; padding: 14px 16px; }
+  .box-soft { border-radius: 12px; }
+  .ed-line { border-color: var(--filet); border-radius: 12px; }
+  .ed-line.is-titre { border-color: #003366; }
+  .ed-act button { border-radius: 7px; transition: filter .15s ease, transform .12s ease; }
+  .ed-act button:hover { filter: brightness(.93); } .ed-act button:active { transform: scale(.92); }
+  .add-zone { border-width: 1px; border-radius: 14px; background: #e6eef8; }
+  .add-title { border-radius: 13px 13px 0 0; }
+  .suite { border-width: 1px; border-radius: 14px; }
+  .suite-title { border-radius: 13px 13px 0 0; }
+  .suite-card { border-radius: 12px; border-color: #cfe9d5; }
+  .alertes, .cgv-info { border-radius: 12px; }
+  .privacy, .note-deg, .bandeau-emise, .cgv-legende { border-radius: 10px; }
+  .pays-btn { border-width: 1px; border-radius: 10px; transition: border-color .15s ease, background-color .15s ease; }
+  .pays-btn:hover { border-color: #94a3b8; }
+  .pays-btn.active { border-width: 2px; }
+  .img-thumb { border-radius: 10px; }
+  .tip::after { border-radius: 10px; }
+  .don-voile { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+  .don-boite { border-radius: 18px; }
+  .credit a { color: #1d4f91; }
+  #doc { border-radius: 2px; }
+
+  /* Comptabilité */
+  .cpt-barre { border-bottom-width: 1px; }
+  .cpt-tuile { border-width: 1px; border-radius: 14px; padding: 13px 14px; }
+  .cpt-carte { border-width: 1px; border-radius: 14px; }
+  .cpt-split { border-width: 1px; border-radius: 12px; }
+  .cpt-barres { border-radius: 12px; }
+  .cpt-table td { border-bottom-width: 1px; }
+  .cpt-ok, .cpt-relances, .cpt-ocrbox, .cpt-imp:not(.cpt-err) { border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 4px; border-radius: 12px; }
+  .cpt-avis { border-width: 1px; border-radius: 12px; }
+  .cpt-alerte-sauv, .cpt-manque-msg, .cpt-verif, .cpt-imp.cpt-err { border-radius: 12px; }
+  .cpt-guide, .cpt-memo, .cpt-fiche, .cpt-rappel, .cpt-prive { border-radius: 10px; }
+  .cpt-prive { border-width: 1px; }
+  .cpt-mini { border-width: 1px; border-radius: 8px; }
+  .cpt-x { border-radius: 8px; transition: background-color .15s ease; } .cpt-x:hover { background: rgba(15,23,42,.06); }
+
+  /* Agenda */
+  .ag-form { border-width: 1px; border-radius: 14px; }
+  .ag-case { border-color: var(--filet); border-radius: 10px; transition: border-color .15s ease; }
+  .ag-case:not(.ag-vide):not(.ag-auj):hover { border-color: #b6cbe8; }
+  .ag-puce { border-radius: 6px; }
+  .ag-ligne { border-radius: 10px; transition: filter .15s ease; }
+  .ag-ligne:hover, .ag-puce:hover { filter: brightness(.97); }
+  .ag-semaine { border-width: 1px 1px 1px 4px; border-radius: 12px; }
+
+  /* Mode sombre : filets neutres au lieu du bleu, barres du graphique moins éblouissantes */
+  html.sombre { --filet: #262d38; --ombre: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35); --anneau: 0 0 0 3px rgba(140,180,255,.22); }
+  html.sombre .panel { border-color: var(--filet); box-shadow: var(--ombre); }
+  html.sombre .espaces { background: #161b22; }
+  html.sombre .esp { background: transparent; border: none; }
+  html.sombre .esp:hover { background: #1f2630; }
+  html.sombre .esp.active, html.sombre .esp.active:hover { background: #2f5d8f; color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.45); }
+  html.sombre .btn-light:hover, html.sombre .cpt-btn.cpt-sec:hover, html.sombre .tab:not(.active):hover, html.sombre .cpt-onglets button:not(.cpt-actif):hover { background: #3a424d; }
+  html.sombre .panel :is(input, select, textarea):focus:not(.cpt-ocr):not(.cpt-acat):not(.cpt-manque):not(.cpt-date-imp),
+  html.sombre .cpt :is(input, select):focus:not(.cpt-ocr):not(.cpt-acat):not(.cpt-manque):not(.cpt-date-imp) { border-color: #8cb4ff; }
+  html.sombre input[type=checkbox], html.sombre input[type=radio] { accent-color: #8cb4ff; }
+  html.sombre .step3 { background: #1c2330; }
+  html.sombre .ed-line { border-color: var(--filet); }
+  html.sombre .ed-line.is-titre { border-color: #2f5d8f; }
+  html.sombre .pays-btn:hover { border-color: #6e7681; }
+  html.sombre .ag-case { border-color: var(--filet); }
+  html.sombre .ag-case:not(.ag-vide):not(.ag-auj):hover { border-color: #3d5a80; }
+  html.sombre .cpt-x:hover { background: rgba(255,255,255,.08); }
+  html.sombre .cpt-b, html.sombre .cpt-l-att { background: #34516f; }
+  html.sombre .cpt-b-enc, html.sombre .cpt-l-enc { background: #5b9be0; }
+  html.sombre .cpt-b.cpt-b-orange { background: #5a3d1c; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn, .cpt-btn, .esp, .tab, .cpt-onglets button, .ed-act button, .btn-x, .ag-ligne { transition: none !important; }
+  .btn:hover, .cpt-btn:hover, .btn:active, .cpt-btn:active { transform: none !important; }
+}
 </style>
 <script>
 /* Mode sombre appliqué avant l'affichage (pas de flash blanc) : choix mémorisé, sinon réglage de l'appareil */
@@ -986,7 +1111,6 @@ html:not(.sombre) .btn-theme { background: #e2e8f0; color: #003366; }
     <div class="suite hidden" id="suite"></div>
 </section>
 
-<div class="credit no-print"><strong>L'Établi par HivertLabs</strong>, logiciel gratuit (licence d'utilisation, <a href="https://github.com/hivertlabs/devis-factures-comptabilite-gratuits" target="_blank" rel="noopener">code source</a>), fourni tel quel, sans garantie. Vérifiez vos documents avant de les envoyer. <a href="#" onclick="ouvrirDon('bouton'); return false;">Soutenir le projet</a><br><a href="guides/">Guides pratiques</a> (devis, TVA, autoliquidation, impayés) · Une erreur, une idée ? Écrivez à <a href="mailto:hivertlabs@hotmail.com?subject=L'%C3%89tabli">hivertlabs@hotmail.com</a></div>
 
 <input type="file" id="fileConfig" accept=".json,application/json" class="hidden" multiple>
 <input type="file" id="fileDevis" accept=".json,application/json" class="hidden">
@@ -1001,6 +1125,8 @@ html:not(.sombre) .btn-theme { background: #e2e8f0; color: #003366; }
 <section id="screenCompta" class="panel no-print hidden">
     <div id="compta"></div>
 </section>
+
+<div class="credit no-print"><strong>L'Établi par HivertLabs</strong>, logiciel gratuit (licence d'utilisation, <a href="https://github.com/hivertlabs/devis-factures-comptabilite-gratuits" target="_blank" rel="noopener">code source</a>), fourni tel quel, sans garantie. Vérifiez vos documents avant de les envoyer. <a href="#" onclick="ouvrirDon('bouton'); return false;">Soutenir le projet</a><br><a href="guides/">Guides pratiques</a> (devis, TVA, autoliquidation, impayés) · Une erreur, une idée ? Écrivez à <a href="mailto:hivertlabs@hotmail.com?subject=L'%C3%89tabli">hivertlabs@hotmail.com</a></div>
 
 <div id="doc" class="hidden">
     <div id="filigrane"></div>
