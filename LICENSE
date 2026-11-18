@@ -1,0 +1,63 @@
+L'Établi : devis, factures et comptabilité gratuits
+Copyright (C) 2026 Guillaume Hivert (HivertLabs). Tous droits réservés.
+https://github.com/hivertlabs/devis-factures-comptabilite-gratuits
+Contact : hivertlabs@hotmail.com
+
+LICENCE D'UTILISATION GRATUITE
+==============================
+
+L'Établi est un logiciel gratuit, mais ce n'est pas un logiciel libre.
+Son auteur en garde tous les droits. Cette licence dit ce que vous
+pouvez en faire.
+
+1. CE QUE VOUS POUVEZ FAIRE, GRATUITEMENT
+-----------------------------------------
+- Utiliser L'Établi, pour vous ou pour votre entreprise, sans limite
+  de durée ni de nombre d'ordinateurs.
+- Le copier pour votre propre usage et en faire des sauvegardes.
+- Le donner à d'autres personnes, gratuitement, à condition de donner
+  le fichier d'origine complet, sans aucune modification, avec ce
+  fichier de licence.
+- Lire son code pour vérifier ce qu'il fait.
+
+2. CE QUI EST INTERDIT SANS L'ACCORD ÉCRIT DE L'AUTEUR
+------------------------------------------------------
+- Modifier, adapter, traduire ou transformer le logiciel, en tout ou
+  en partie, et diffuser une version modifiée.
+- Reprendre tout ou partie de son code, de ses textes ou de son
+  interface dans un autre logiciel, site ou service.
+- Le vendre, le louer ou le faire payer de quelque façon que ce soit,
+  y compris en le proposant comme service en ligne.
+- Retirer, masquer ou remplacer la mention « L'Établi par HivertLabs »,
+  la notice de copyright ou le lien de don.
+- Utiliser les noms « L'Établi » et « HivertLabs » pour présenter ou
+  promouvoir un autre produit.
+
+Le dépôt GitHub étant public, les conditions d'utilisation de GitHub
+permettent de le consulter et d'en faire une copie (fork) sur GitHub.
+Cela ne donne aucun autre droit que ceux du point 1.
+
+Pour toute demande d'autorisation : hivertlabs@hotmail.com.
+
+3. DROITS GARANTIS PAR LA LOI
+----------------------------
+Cette licence ne retire rien aux droits que l'article L122-6-1 du Code
+de la propriété intellectuelle accorde à l'utilisateur légitime d'un
+logiciel (copie de sauvegarde, correction d'erreurs pour son propre
+usage, observation du fonctionnement).
+
+4. AUCUNE GARANTIE
+------------------
+L'Établi est fourni tel quel, sans garantie d'aucune sorte. Vérifiez
+vos documents et vos déclarations avant de les envoyer. Dans les
+limites permises par la loi, l'auteur ne peut être tenu responsable
+des conséquences de son utilisation.
+
+5. COMPOSANTS TIERS
+-------------------
+Tesseract, PDF.js et les données de langue française restent sous leur
+propre licence (Apache 2.0) : voir LICENCES_TIERS.txt.
+
+6. DROIT APPLICABLE
+-------------------
+Cette licence est soumise au droit français.

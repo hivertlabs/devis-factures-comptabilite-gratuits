@@ -1,0 +1,263 @@
+L'ÉTABLI : DEVIS, FACTURES ET COMPTABILITÉ GRATUITS
+MODE D'EMPLOI
+==================================================
+
+Pour les artisans et les indépendants. Sans abonnement, sans compte,
+tout reste sur votre ordinateur. Rien n'est envoyé sur internet : vos
+clients, vos prix et vos documents ne quittent pas votre machine.
+
+
+1. DÉMARRER (5 à 10 minutes, une seule fois)
+--------------------------------------------
+- Ouvrez L'Établi : soit en ligne avec le lien qu'on vous a donné, soit
+  en double-cliquant sur le fichier « LEtabli.html ». Pour l'obtenir :
+  sur le site, bouton « Télécharger L'Établi », sous les boutons de
+  l'accueil. C'est un seul fichier, qui contient tout.
+  Conseil : utilisez toujours la même façon de l'ouvrir (voir rubrique 4).
+- Cliquez sur « Créer ma configuration » et suivez les 8 étapes : votre
+  entreprise, votre logo, vos mentions légales, vos assurances, vos taux
+  de TVA, vos tarifs, vos conditions, votre signature.
+- À la fin, cliquez sur « Terminer ». Un fichier « config_devis_... .json »
+  est téléchargé. C'EST VOTRE GÉNÉRATEUR PERSONNEL : gardez-le.
+
+Les fois suivantes : ouvrez la page, cliquez sur « Charger ma
+configuration » et choisissez ce fichier. Tout est prêt.
+Pour changer une adresse, un tarif ou un logo : « Modifier ma
+configuration », puis « Télécharger ma configuration ».
+
+
+2. FAIRE UN DEVIS
+-----------------
+- Remplissez le client, l'objet et la date prévue des travaux.
+- Dans le cadre bleu « AJOUTER UNE LIGNE », choisissez une prestation, une
+  majoration, le déplacement ou un titre. Une fois la ligne ajoutée, tout
+  se modifie dessus : désignation, quantité, unité, prix, TVA.
+- Le cadre jaune « À vérifier avant d'envoyer » signale ce qui manque.
+- Cliquez sur « Enregistrer (.json) » pour garder le devis, puis sur
+  « IMPRIMER LE DEVIS » et choisissez une imprimante PDF.
+- Le nom du fichier PDF (par exemple F-2026-003_Martin) est copié au
+  moment du clic. Si la case « Nom » de la fenêtre d'enregistrement est
+  vide, cliquez dedans, faites Ctrl+V, puis Entrée.
+
+Les petits « i » ronds affichent une explication quand vous passez la
+souris dessus.
+
+
+3. DU DEVIS À LA FACTURE
+------------------------
+Le cadre vert « ET ENSUITE ? », en bas de l'écran, vous guide.
+
+Sans acompte :
+- Travaux finis : ouvrez le devis (.json), cliquez sur « Transformer ce
+  devis en facture », complétez la date de la prestation, puis cliquez sur
+  « ÉMETTRE ET IMPRIMER LA FACTURE ».
+
+Avec acompte :
+- Le client a signé : ouvrez le devis, cliquez sur « Faire la facture
+  d'acompte », puis émettez-la. Gardez son fichier (ex. F-2026-001.json).
+- Travaux finis : ouvrez ce fichier F-2026-001.json et cliquez sur « Faire
+  la facture de solde ». L'acompte est déduit tout seul, avec son numéro,
+  sa date et son montant. Il ne reste qu'à émettre.
+
+Émettre une facture, c'est définitif : elle reçoit son numéro, elle est
+verrouillée et son fichier .json est téléchargé pour vos archives.
+
+Une erreur sur une facture émise ? Elle ne se modifie pas et ne se
+supprime pas. Ouvrez-la et cliquez sur « Créer un avoir » : il l'annule,
+en entier ou en partie.
+
+
+4. LA NUMÉROTATION DES FACTURES
+-------------------------------
+- Les devis et les factures ont chacun leur compteur. Vous pouvez en être
+  au devis n° 10 et à la facture n° 3.
+- Le numéro de facture est proposé tout seul (le dernier + 1). Sous le
+  numéro, le logiciel rappelle la dernière facture émise.
+- Factures, factures d'acompte et avoirs se suivent dans la même série :
+  F-2026-001, F-2026-002... La série repart à 001 chaque année.
+- La loi impose une suite sans trou ni doublon. Le logiciel vous prévient
+  si un numéro est déjà pris ou s'il en saute un.
+
+Le compteur est gardé dans votre navigateur. Il peut être perdu si vous
+changez d'ordinateur ou de navigateur, si vous effacez les données de
+navigation, ou si vous déplacez ou renommez le fichier du logiciel.
+Avec le lien en ligne, ce dernier cas n'arrive pas.
+Dans ce cas, deux façons de le retrouver :
+- ouvrez votre dernière facture (.json) : le compteur se remet à jour ;
+- ou indiquez le dernier numéro émis dans « Modifier ma configuration »,
+  étape 8 (Signature).
+Pour ne pas en arriver là : quand le bandeau jaune le propose, téléchargez
+à nouveau votre configuration. Elle contient le compteur.
+
+
+5. LES FICHIERS À GARDER
+------------------------
+Rangez tout dans un même dossier et sauvegardez-le :
+- config_devis_... .json : votre configuration ;
+- D-2026-001.json : chaque devis, pour le rouvrir ou le facturer ;
+- F-2026-001.json : chaque facture émise ;
+- compta_2026_... .json : votre dossier comptable de l'année ;
+- les PDF envoyés à vos clients. Une facture se conserve 10 ans.
+Le bouton « Tout enregistrer », en haut, télécharge d'un coup votre
+configuration et votre dossier comptable ouvert, avec des noms assortis.
+La première fois, le navigateur peut demander s'il a le droit de
+télécharger plusieurs fichiers : cliquez sur « Autoriser ».
+
+
+6. À SAVOIR
+-----------
+- En France, TVA : 20 % en général. Dans un logement de plus de 2 ans, 10 % pour la
+  rénovation et 5,5 % pour la rénovation énergétique. En cas de doute,
+  demandez à votre comptable.
+- Mode démo (SPÉCIMEN) : pour un essai ou un exemple. Une facture en mode
+  démo ne prend pas de numéro.
+- En France, facture électronique : depuis le 1er septembre 2026, toute entreprise
+  doit pouvoir recevoir des factures électroniques. L'obligation d'en
+  émettre s'étend aux PME et micro-entreprises le 1er septembre 2027, pour
+  les factures entre professionnels établis en France (via une plateforme
+  agréée). L'Établi produit des factures PDF : elles restent valables pour
+  vos clients particuliers, et pour vos clients professionnels jusqu'à
+  cette échéance. À la même date, vos ventes aux particuliers devront
+  aussi être déclarées à l'administration (e-reporting), via une
+  plateforme agréée. L'Établi ne transmet rien à une plateforme : cette
+  partie reste à faire de votre côté.
+- En France, dépannage chez les particuliers : si vous faites du dépannage, de la
+  réparation ou de l'entretien (plomberie, électricité, chauffage...),
+  cochez la case prévue dans la configuration, étape des conditions.
+  Vos devis indiqueront que le client peut garder les pièces remplacées,
+  comme l'exige la loi.
+
+
+6 bis. VOS CONDITIONS GÉNÉRALES DE VENTE (CGV)
+-----------------------------------------------
+Facultatif. Dans la configuration, étape « Conditions », cochez
+« Joindre mes conditions générales de vente à mes devis ».
+- Vous avez déjà des CGV : collez-les dans la zone.
+- Vous n'en avez pas : cliquez sur « Mettre le squelette dans la zone ».
+  C'est un texte à trous : complétez ou supprimez chaque passage entre
+  crochets [ ... ]. Sur l'aperçu, ces passages sont surlignés en jaune.
+  Tant qu'il en reste un, l'impression est bloquée : c'est voulu, pour
+  qu'aucun client ne reçoive des CGV à trous. Pour vos propres
+  précisions, utilisez des parenthèses ( ), jamais des crochets.
+- Pour un texte long, cliquez sur « Télécharger en .txt », travaillez-le
+  dans Word ou le Bloc-notes, puis recollez-le dans la zone.
+Les CGV s'impriment sur une page à part, à la suite du devis. Le cadre
+de signature du client indique qu'il les a lues et acceptées : c'est ce
+qui les rend valables face à lui.
+
+
+7. VOTRE PAYS
+-------------
+L'Établi fonctionne en France, en Belgique, au Luxembourg, en Suisse et
+au Québec. Choisissez votre pays tout en haut de la première étape de la
+configuration. Les taux de taxes, les mentions légales, les numéros
+demandés (SIRET, numéro BCE, autorisation d'établissement, IDE, NEQ...)
+et la monnaie s'adaptent tout seuls.
+Changer de pays remet les taux et la forme juridique à zéro, mais garde
+vos coordonnées, vos tarifs et votre logo.
+- Belgique : une facture à un client assujetti à la TVA doit passer par
+  le réseau Peppol depuis le 1er janvier 2026. Le PDF reste valable pour
+  vos clients particuliers.
+- Suisse : la QR-facture n'est pas encore générée.
+- Québec : la TPS et la TVQ sont calculées et affichées séparément, et
+  le devis s'appelle une soumission.
+
+
+7 bis. LA COMPTABILITÉ (France)
+-------------------------------
+Une fois votre configuration chargée, deux grands boutons apparaissent
+en haut : « Devis et factures » et « Comptabilité ».
+
+Pour commencer :
+- Cliquez sur « Comptabilité », indiquez l'année, puis « Créer un
+  nouveau dossier ». Il y a un dossier comptable par année.
+- Cliquez sur « Importer des factures (.json) » et sélectionnez d'un
+  coup tous les fichiers de vos factures de l'année (Ctrl+A).
+  Ensuite, chaque facture que vous émettez s'ajoute toute seule au
+  dossier ouvert.
+- Cliquez sur « Enregistrer le dossier » : un fichier « compta_... .json »
+  est téléchargé. GARDEZ-LE avec votre configuration. La fois suivante,
+  cliquez sur « Ouvrir un dossier » et choisissez ce fichier.
+  Le bouton devient rouge tant que des modifications ne sont pas
+  enregistrées dans votre fichier.
+- Plus rapide : sur l'accueil, cliquez sur « Charger ma configuration »
+  et sélectionnez les deux fichiers d'un coup, la configuration et le
+  dossier comptable (clic sur l'un, puis Ctrl + clic sur l'autre).
+  L'Établi charge l'une et ouvre l'autre.
+- Un dossier comptable appartient à une seule entreprise : celle de la
+  configuration qui l'a créé. Si vous ouvrez le dossier d'une autre
+  entreprise que celle de la configuration chargée, il est refusé (ou
+  bloqué, sans rien modifier) : chargez la bonne configuration.
+
+Au quotidien :
+- Un client a payé : onglet « Ventes et encaissements », « + encaissement »
+  sous la facture. La date à indiquer est le jour où l'argent est arrivé
+  sur votre compte : c'est elle qui fixe le mois de votre TVA et de
+  votre déclaration URSSAF.
+- Une dépense : onglet « Dépenses », bouton « Photo ou PDF du
+  justificatif ». Prenez la photo bien au-dessus du ticket, posé à
+  plat, sans reflet. Les cases se remplissent toutes seules, en jaune :
+  vérifiez-les, choisissez la catégorie, puis enregistrez. Écrivez le
+  numéro de pièce (A-2026-001...) au dos du ticket.
+  La photo ne remplace pas l'original : gardez le ticket ou la facture
+  pendant 10 ans.
+- Une erreur : rien ne s'efface. Le bouton « corriger » (dépenses) ou
+  « annuler » garde la trace de l'ancienne version.
+- Sous-traitance du bâtiment : si votre sous-traitant vous facture SANS
+  TVA (mention « autoliquidation »), choisissez la catégorie
+  « Sous-traitance » et cochez la case « Facture sans TVA d'un
+  sous-traitant du bâtiment ». Indiquez le taux des travaux chez votre
+  client : la TVA à déclarer et à déduire est calculée toute seule.
+  À l'inverse, une sous-traitance facturée AVEC TVA est signalée dans
+  « Contrôles » : vérifiez qu'elle n'aurait pas dû être en
+  autoliquidation.
+
+Les relances :
+- Une facture non payée après son échéance est signalée sur le
+  « Tableau de bord » et par une pastille sur l'onglet « Ventes et
+  encaissements ».
+- Sous la facture, cliquez sur « relancer » : le logiciel dit quoi
+  faire à cette étape (rappel, relance écrite, mise en demeure,
+  recours) et, pour un client professionnel, calcule les pénalités de
+  retard et l'indemnité de 40 €.
+- C'est vous qui appelez ou qui écrivez. Ensuite, notez-le avec
+  « Noter la relance » : la date, le moyen, une note. La relance
+  suivante est proposée 15 jours plus tard, et l'historique sert de
+  preuve s'il faut aller plus loin.
+- Réglages (onglet « Paramètres ») : le nombre de jours après
+  l'échéance avant d'être prévenu (0 par défaut) et l'écart entre deux
+  relances (15 jours). La date se change aussi facture par facture.
+- Une facture de l'an dernier encore impayée : importez-la dans le
+  dossier de cette année pour continuer à la suivre.
+
+En fin de mois ou d'année :
+- « Tableau de bord » : bleu foncé = payé, bleu clair = pas encore payé.
+- « TVA » ou « Micro-entreprise » : les montants par mois ou par trimestre.
+- « Contrôles » : numéros de facture manquants, points à vérifier.
+- « Exports » : PDF, CSV, et fichier FEC pour votre comptable. Donnez-
+  lui le FEC tel quel : il l'importe dans son logiciel.
+
+À savoir : la comptabilité applique les règles françaises. Elle aide à
+préparer vos déclarations et le travail de votre comptable, elle ne les
+remplace pas. La lecture automatique des tickets peut se tromper :
+c'est toujours vous qui validez.
+
+
+8. GRATUIT, ET POUR TOUJOURS
+----------------------------
+L'Établi est un logiciel gratuit créé par HivertLabs : sans publicité,
+sans version payante. Il est fourni tel quel, sans garantie.
+Vous pouvez l'utiliser librement, pour vous ou votre entreprise, et le
+donner à qui vous voulez, à condition de donner le fichier d'origine
+sans le modifier. Son auteur en garde tous les droits : il est interdit
+de le modifier, de reprendre son code ou de le revendre sans accord
+écrit. Détails dans le fichier LICENSE.
+De temps en temps, une petite fenêtre propose de faire un don. Elle se
+ferme d'un clic, et le logiciel marche exactement pareil sans don.
+Le bouton « Soutenir L'Établi », en haut, mène au même endroit.
+
+
+9. UNE QUESTION, UNE ERREUR ?
+-----------------------------
+Écrivez à hivertlabs@hotmail.com : une erreur sur un document, une
+mention qui manque pour votre métier ou votre pays, une idée.
