@@ -57,6 +57,8 @@ Pourquoi : le navigateur garde en mémoire quelques informations pour vous faire
 
 L'Établi fonctionne avec les navigateurs les plus répandus : **Edge** (celui qui est déjà installé sur Windows), **Chrome** et **Firefox**. Gardez celui que vous utilisez déjà.
 
+Il marche aussi sur **téléphone** : les écrans s'y adaptent. Sur Android, le fichier téléchargé s'ouvre en le touchant dans vos téléchargements ; sur iPhone, utilisez le lien du site. Le bouton **🌙 Mode sombre**, en haut, repose les yeux le soir ; vos documents s'impriment toujours en clair.
+
 Pour faire vos PDF, cliquez sur le bouton « Imprimer » du logiciel et choisissez une imprimante PDF : « Enregistrer au format PDF » ou « Microsoft Print to PDF ». Le logiciel copie le nom du fichier au moment du clic (par exemple `F-2026-003_Martin`). Si la case « Nom » de la fenêtre d'enregistrement est vide, cliquez dedans, faites **Ctrl+V**, puis Entrée.
 
 ---
@@ -85,7 +87,7 @@ Le logiciel vous demande donc :
 | **Capital social, RCS ou RM** | Pour les sociétés : le capital et le lieu d'immatriculation font partie des mentions obligatoires. |
 | **Assurance** | Pour les métiers du bâtiment, l'assurance décennale est obligatoire. Vos devis et factures doivent indiquer l'assureur, le contrat et la zone couverte. C'est aussi un argument : un client prudent vérifie. |
 | **Taux de TVA** | Voir chapitre 7. Si vous êtes en franchise de TVA, le logiciel imprime la mention « TVA non applicable, art. 293 B du CGI », obligatoire dans ce cas. |
-| **Tarifs** | Vos prix habituels, pour ne pas les retaper à chaque devis. |
+| **Tarifs** | Vos prix habituels, pour ne pas les retaper à chaque devis. Le bouton « Partir d'un modèle de mon métier » ajoute une dizaine de prestations courantes de votre métier, prix à zéro : vous mettez les vôtres. |
 | **Conditions de paiement** | Délai de paiement, pénalités de retard, et pour les clients professionnels l'indemnité forfaitaire de 40 € pour frais de recouvrement. Ces mentions sont obligatoires : sans elles, vous aurez plus de mal à réclamer des pénalités à un mauvais payeur. |
 | **Dépannage chez les particuliers** | Si vous faites du dépannage, de la réparation ou de l'entretien (plomberie, électricité, chauffage...), cochez la case : vos devis indiqueront que le client peut garder les pièces remplacées, comme la loi l'exige. |
 | **Signature** | Une image de votre signature et de votre tampon. Sans image, la case reste vide pour signer et tamponner à la main. |
@@ -174,6 +176,20 @@ L'obligation d'en *émettre* arrive pour les petites entreprises et les micro-en
 
 L'Établi fait des factures PDF et ne transmet rien à une plateforme. D'ici là, rien ne change pour vous. Le moment venu, certaines plateformes agréées acceptent vos factures PDF et les transforment en factures électroniques, parfois gratuitement (Indy, par exemple).
 
+
+### Le client a signé : notez l'intervention dans l'agenda
+
+Dans le devis, sous « Date prévue des travaux », le bouton **📅 Mettre à l'agenda** ouvre l'agenda avec le client, le lieu, le n° de devis et les dates déjà remplis (si vous avez écrit des dates comme « du 02/12 au 04/12 »). Vérifiez, ajoutez une heure si vous voulez, et enregistrez.
+
+L'onglet **📅 Agenda** rassemble :
+- ce que vous notez vous-même : **interventions** (sur un ou plusieurs jours), **rendez-vous** (visite pour un devis, métré) et **rappels** ;
+- ce que L'Établi ajoute tout seul : les **échéances** et les **relances** de vos factures (quand le dossier comptable est ouvert), la **fin de validité des devis** que vous imprimez, et la **fin de votre attestation décennale** si vous avez indiqué sa date dans la configuration.
+
+**Pourquoi c'est utile :** un devis qui expire sans réponse, c'est un client à relancer. Une échéance qui passe, c'est une relance à faire. Tout est au même endroit, à côté de vos factures.
+
+**Sur votre téléphone :** le bouton **📲 Envoyer tout l'agenda vers mon téléphone** crée un fichier .ics, le format que lisent tous les agendas. Sur iPhone, touchez le fichier puis « Tout ajouter ». Dans Outlook, ouvrez-le. Dans Google Agenda, importez-le depuis un ordinateur (calendar.google.com, Paramètres, « Importer »). Ce n'est pas une synchronisation : après une modification, renvoyez le fichier.
+
+**À ne pas oublier :** l'agenda est rangé dans votre fichier de configuration. Après l'avoir modifié, enregistrez votre configuration (« Tout enregistrer »).
 ---
 
 ## 5. La numérotation : pourquoi elle est si surveillée
@@ -337,7 +353,7 @@ En franchise :
 
 Au 1er janvier 2027, les règles de TVA changent de code (elles passent du Code général des impôts au Code des impositions sur les biens et services). Le fond ne change pas, et la mention « art. 293 B du CGI » reste admise sur les factures jusqu'au 30 juin 2028. Le logiciel sera mis à jour d'ici là.
 
-**Attention au dépassement :** si vous dépassez les seuils majorés (93 500 € pour les ventes, 41 250 € pour les services), vous devez facturer la TVA dès le jour du dépassement. L'onglet « Contrôles » vous prévient.
+**Attention au dépassement :** si vous dépassez le seuil sans dépasser le seuil majoré, la TVA s'applique au 1er janvier suivant. Si vous dépassez les seuils majorés (93 500 € pour les ventes, 41 250 € pour les services), vous devez facturer la TVA dès le jour du dépassement. Le tableau de bord de la compta montre où vous en êtes et, au rythme de vos encaissements, vers quelle date vous atteindriez chaque seuil. L'onglet « Contrôles » vous prévient aussi.
 
 **Pourquoi rester en franchise ou non ?** En franchise, vos prix sont plus bas pour un particulier, qui ne récupère pas la TVA. Mais vous ne récupérez rien sur vos achats. Si vous achetez beaucoup de matériel ou si vos clients sont surtout des professionnels (qui, eux, récupèrent la TVA), facturer la TVA peut être plus intéressant. C'est un vrai choix à faire selon votre activité.
 
@@ -405,6 +421,8 @@ Taux de cotisations 2026 :
 | Professions libérales | 25,6 % | 2,2 % | 34 % |
 
 Plafonds de chiffre d'affaires : 203 100 € au total, dont 83 600 € de prestations au maximum. Dépasser deux années de suite fait sortir du régime.
+
+**L'ACRE** (aide à la création) réduit vos cotisations au démarrage, jusqu'à la fin du 3e trimestre civil qui suit le début d'activité. Depuis le 1er juillet 2026, le taux réduit est passé de 50 % à 75 % du taux normal. Si vous en bénéficiez, indiquez dans la compta (onglet « Paramètres ») la date de fin et le taux qui figurent sur votre attestation Urssaf : les cotisations estimées en tiennent compte.
 
 **Pourquoi séparer ventes et prestations ?** Un artisan qui fournit le matériel a une activité « mixte » : le matériel revendu est une vente (12,3 %), la pose est une prestation (21,2 %). Déclarer tout en prestations, c'est payer trop. Déclarer tout en ventes, c'est payer trop peu et risquer un redressement. Le logiciel fait le tri à partir de vos lignes de facture. L'onglet « Micro-entreprise » vous donne les deux montants, mois par mois.
 

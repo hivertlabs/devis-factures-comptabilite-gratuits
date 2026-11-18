@@ -146,6 +146,33 @@ Facultatif. Dans la configuration, étape « Conditions », cochez
 Les CGV s'impriment sur une page à part, à la suite du devis. Le cadre
 de signature du client indique qu'il les a lues et acceptées : c'est ce
 qui les rend valables face à lui.
+- Agenda (onglet « 📅 Agenda ») : ajoutez vos interventions, rendez-vous
+  et rappels. Dans un devis, le bouton « 📅 Mettre à l'agenda » (sous
+  « Date prévue des travaux ») reprend le client, le lieu et les dates.
+  Les échéances et relances de vos factures (dossier compta ouvert), la
+  fin de validité des devis imprimés et la fin de l'attestation
+  décennale (si vous l'avez indiquée) s'ajoutent toutes seules.
+  L'agenda est rangé dans votre fichier de configuration : enregistrez-la
+  après l'avoir modifié.
+- Envoyer l'agenda vers votre téléphone : bouton « 📲 Envoyer tout
+  l'agenda vers mon téléphone ». Il crée un fichier .ics, lu par tous les
+  agendas (iPhone, Outlook, Google). Ce n'est pas une synchronisation :
+  après une modification, renvoyez le fichier.
+- Téléphone : L'Établi s'utilise aussi sur téléphone. Sur Android, le
+  fichier téléchargé s'ouvre en le touchant dans vos téléchargements ;
+  sur iPhone, utilisez le lien du site.
+- Mode sombre : bouton « 🌙 Mode sombre » en haut. L'impression reste
+  identique.
+- Modèles par métier : dans la configuration, étape « Tarifs », le bouton
+  « Partir d'un modèle de mon métier » ajoute une dizaine de prestations
+  courantes, prix à zéro. Mettez vos prix.
+- Franchise de TVA : le tableau de bord de la compta montre où vous en
+  êtes par rapport aux seuils, et vers quelle date vous les atteindriez
+  au rythme actuel.
+- ACRE (micro-entreprise) : dans la compta, onglet « Paramètres »,
+  indiquez la date de fin et le taux de votre attestation Urssaf : les
+  cotisations estimées en tiennent compte.
+- Guides pratiques en ligne : lien « Guides pratiques » en bas de page.
 
 
 7. VOTRE PAYS

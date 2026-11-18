@@ -15,6 +15,8 @@
 - ✅ **Comptabilité** micro-entreprise et régime réel, TVA, fichier FEC pour le comptable
 - ✅ **Relances des impayés** : le logiciel vous prévient quand une facture dépasse son échéance, vous dit quoi faire et garde la trace de vos relances
 - ✅ **Lecture automatique des tickets de caisse** : prenez le ticket en photo, la date, le montant et la TVA se remplissent seuls, et les montants sont vérifiés par le calcul. La lecture se fait sur votre ordinateur.
+- ✅ **Agenda** : vos interventions, rendez-vous et dates importantes, à envoyer d'un clic vers l'agenda de votre téléphone
+- ✅ **Sur ordinateur et sur téléphone**, avec un mode sombre
 - ✅ **5 pays** : France, Belgique, Luxembourg, Suisse, Québec
 
 ## Ce que fait L'Établi
@@ -29,6 +31,9 @@
 - **Garde-fous** : le logiciel signale ce qui manque avant que vous envoyiez un document.
 - **Nom du PDF prêt** : au clic sur Imprimer, le nom du fichier (numéro et client, par exemple `F-2026-003_Martin`) est copié. Il suffit d'un Ctrl+V dans la fenêtre d'enregistrement.
 - **Tout enregistrer en un clic** : votre configuration et votre dossier comptable de l'année, deux fichiers aux noms assortis à ranger ensemble.
+- **Agenda** : notez vos interventions (sur un ou plusieurs jours), vos rendez-vous et vos rappels. Depuis un devis, un bouton reprend le client, le lieu et les dates prévues. S'y ajoutent tout seuls les échéances et les relances de vos factures, la fin de validité des devis que vous imprimez et la fin de votre attestation décennale. Un bouton envoie tout vers l'agenda de votre téléphone, d'Outlook ou de Google (fichier .ics), avec un rappel si vous le souhaitez. L'agenda est rangé dans votre fichier de configuration : rien ne part sur internet.
+- **Téléphone et mode sombre** : les écrans s'adaptent au téléphone (et le bouton « Prendre en photo » ouvre directement l'appareil photo pour vos tickets). Le mode sombre se règle d'un clic, l'impression ne change pas.
+- **Modèles par métier** : plomberie, électricité, peinture, maçonnerie, menuiserie, carrelage, couverture, multiservices, nettoyage, espaces verts. Une dizaine de prestations courantes s'ajoutent en un clic à votre catalogue, prix à zéro : vous mettez les vôtres.
 - **Petites bulles d'aide** sur les points qui posent question.
 
 ## La comptabilité (France)
@@ -43,6 +48,8 @@ Un espace **Comptabilité** s'ouvre à côté des devis et des factures :
 - **Relances** : une facture non payée après son échéance est signalée sur le tableau de bord. Pour chaque étape (rappel, relance écrite, mise en demeure, recours), le logiciel dit quoi faire et calcule les pénalités de retard dues par un client professionnel. Il ne relance personne à votre place : c'est vous qui appelez ou écrivez, il garde la trace.
 - **Sous-traitance du bâtiment** : vos factures en autoliquidation, et celles de vos sous-traitants que vous devez autoliquider, sont comptées comme il faut dans la TVA et le FEC. Une sous-traitance facturée avec TVA est signalée, pour vérifier qu'elle n'aurait pas dû être en autoliquidation.
 - **Une entreprise, un dossier** : le dossier comptable reste attaché à l'entreprise de votre configuration. Si vous gérez deux entreprises, rien ne se mélange.
+- **Franchise de TVA** : le tableau de bord montre où vous en êtes par rapport aux seuils et, au rythme de vos encaissements, vers quelle date vous les atteindriez.
+- **ACRE** : si vous en bénéficiez, les cotisations estimées tiennent compte du taux réduit de votre attestation.
 - **Exports** en PDF et en CSV.
 
 La comptabilité applique les règles françaises. Elle n'existe pas encore pour les autres pays. Elle aide à préparer vos déclarations et le travail de votre comptable, elle ne les remplace pas.
@@ -77,6 +84,10 @@ Le mode d'emploi complet est dans [Mode_d_emploi.txt](Mode_d_emploi.txt). Vous d
 - **Nouveau code de la TVA** : au 1er janvier 2027, les articles de TVA passent du Code général des impôts au Code des impositions sur les biens et services. Les mentions qui citent le CGI (franchise, autoliquidation) restent admises sur les factures jusqu'au 30 juin 2028 : L'Établi les mettra à jour d'ici là.
 - **Ventes de biens** : L'Établi est pensé pour les prestations et les travaux. Il ne gère pas les mentions propres à certaines ventes de produits (garantie légale de conformité pour les particuliers, éco-participation, copie privée, membre d'association agréée). Si vous êtes concerné, ajoutez-les dans la note libre du document.
 - Le logiciel est fourni tel quel, sans garantie. Les mentions ont été comparées aux sources officielles de chaque pays en novembre 2026 (service-public.fr et Légifrance pour la France, SPF Finances pour la Belgique, guichet.public.lu pour le Luxembourg, loi sur la TVA et AFC pour la Suisse, Revenu Québec et RBQ pour le Québec). La réglementation évolue : vérifiez-la sur ces sites.
+
+## Guides pratiques
+
+Des guides clairs sur les devis de travaux, la facture sans TVA, l'autoliquidation, les impayés et la comptabilité : https://hivertlabs.github.io/devis-factures-comptabilite-gratuits/guides/
 
 ## Contact
 

@@ -57,7 +57,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1a1
 .g4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
 .field-group { margin-bottom: 4px; }
 .field-group > label, .lbl { display: block; font-weight: bold; margin-bottom: 4px; font-size: 12px; color: #003366; }
-.panel input[type=text], .panel input[type=number], .panel input[type=date], .panel input[type=email], .panel select, .panel textarea { padding: 7px 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; font-family: inherit; font-size: 13px; background: #fff; }
+.panel input[type=text], .panel input[type=number], .panel input[type=date], .panel input[type=time], .panel input[type=email], .panel select, .panel textarea { padding: 7px 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; font-family: inherit; font-size: 13px; background: #fff; }
 .panel textarea { resize: vertical; }
 .check { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: bold; color: #003366; cursor: pointer; margin: 6px 0; }
 .check input { width: 17px; height: 17px; cursor: pointer; flex-shrink: 0; }
@@ -138,7 +138,10 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1a1
 .suite-grid.une { grid-template-columns: 1fr; }
 .suite-card { background: #fff; border: 1px solid #b7dfbd; border-radius: 6px; padding: 10px; font-size: 12.5px; line-height: 1.4; color: #1e293b; }
 .suite-card b { display: block; color: #1e7b34; font-size: 13px; margin-bottom: 3px; }
-.suite-card .btn { margin-top: 8px; width: 100%; }
+.suite-card .btn { margin-top: auto; width: 100%; }
+/* Cartes de même hauteur, bouton toujours calé en bas */
+.suite-card { display: flex; flex-direction: column; }
+.suite-txt { display: block; margin-bottom: 10px; }
 .suite-note { padding: 0 12px 12px 12px; font-size: 12.5px; color: #1e293b; }
 .alertes { margin-top: 14px; padding: 10px 12px; border: 1px solid #f0b429; background: #fffbea; border-radius: 6px; font-size: 12.5px; color: #7a5300; }
 .alertes b { display: block; margin-bottom: 4px; color: #a15c00; }
@@ -317,6 +320,10 @@ table.d-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
 .cpt-legende i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
 .cpt-l-enc { background: var(--cpt-accent); } .cpt-l-att { background: #b9d3ee; } .cpt-l-or { background: #e07b00; }
 .cpt-tuile.cpt-tuile-att { border-color: #b9d3ee; background: #eef5fc; }
+.cpt-seuil { margin: 8px 0 12px; }
+.cpt-jauge { position: relative; height: 12px; margin: 5px 0; background: linear-gradient(90deg, #1e7d32, #e0b400 80%, #c62828); border-radius: 6px; }
+.cpt-jauge i { position: absolute; top: 0; bottom: 0; right: 0; background: #e2e8f0; border-radius: 0 6px 6px 0; }
+.cpt-jauge s { position: absolute; top: -3px; bottom: -3px; width: 2px; background: #1a1a1a; }
 
 .cpt-table { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: .95em; }
 .cpt-table th, .cpt-table td { padding: 6px 8px; border-bottom: 2px solid #e2e8f0; text-align: left; vertical-align: top; }
@@ -400,7 +407,186 @@ table.d-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
 .cpt-verif { flex: 1 1 280px; margin: 8px 0; padding: 10px 12px; background: #fdecea; border: 2px solid #c62828; border-left: 6px solid #c62828; border-radius: 4px; color: #8e1b14; line-height: 1.45; }
 .cpt-verif.cpt-flash { animation: cpt-clac 1s ease-in-out 2; }
 
+
+/* ===================== AGENDA ===================== */
+.ag-barre { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; margin: 8px 0 12px; }
+.ag-ajout { display: flex; flex-wrap: wrap; gap: 6px; }
+.ag-form { border: 2px solid #003366; border-radius: 8px; background: #f8fbfd; padding: 10px 14px; margin: 0 0 14px; }
+.ag-form h3 { margin-top: 0 !important; }
+.ag-large { grid-column: span 2; }
+.ag-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.ag-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.ag-nav b { font-size: 16px; color: #003366; min-width: 150px; text-align: center; text-transform: capitalize; }
+.ag-grille { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+.ag-tete { font-size: 11px; font-weight: bold; color: #64748b; text-align: center; padding: 2px 0; }
+.ag-case { min-height: 86px; background: #f8fbfd; border: 1px solid #dbe7f3; border-radius: 5px; padding: 3px; overflow: hidden; }
+.ag-case.ag-vide { background: transparent; border-color: transparent; }
+.ag-case.ag-auj { border: 2px solid #003366; }
+.ag-num { font-size: 11px; font-weight: bold; color: #475569; margin-bottom: 2px; }
+.ag-puce { display: block; width: 100%; text-align: left; border: none; border-radius: 3px; padding: 2px 4px; margin-bottom: 2px; font: inherit; font-size: 10.5px; line-height: 1.25; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ag-plus { font-size: 10px; color: #64748b; }
+.ag-intervention { background: #dbe9f8; color: #0b3d75; } .ag-rdv { background: #ede7fb; color: #4c1d95; } .ag-rappel { background: #e5e7eb; color: #1f2937; }
+.ag-echeance { background: #e3f3e5; color: #1b5e20; } .ag-relance { background: #fdecea; color: #8e1b14; } .ag-devis { background: #fdf0dc; color: #7a4300; } .ag-assurance { background: #d9f2ef; color: #0f5249; }
+.ag-jour { margin-bottom: 10px; }
+.ag-jour-t { font-weight: bold; color: #003366; font-size: 13px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; margin-bottom: 4px; }
+.ag-ligne { display: flex; gap: 8px; align-items: flex-start; padding: 6px 8px; border-radius: 5px; margin-bottom: 4px; cursor: pointer; font-size: 13px; }
+.ag-ico { font-size: 16px; line-height: 1.2; }
+.ag-jour-t::first-letter { text-transform: uppercase; }
+.ag-gris { color: #64748b; font-size: 12px; font-weight: normal; }
+.ag-ligne .ag-gris { color: inherit; opacity: 0.8; }
+.ag-semaine { margin: 10px 0 14px; padding: 10px 14px; background: #eef7ff; border: 2px solid #b6d4fe; border-left: 6px solid #003366; border-radius: 4px; }
+.ag-semaine h3 { margin: 0 0 6px; } .ag-semaine ul { margin: 4px 0 8px; padding-left: 20px; }
+
+/* ===================== TÉLÉPHONE (petits écrans) ===================== */
+@media screen and (max-width: 700px) {
+  body { padding: 8px; }
+  .panel { padding: 12px; }
+  .appbar h1 { font-size: 17px; }
+  .welcome { padding: 16px 4px; }
+  .welcome h2 { font-size: 20px; }
+  .grid.g2, .grid.g3, .add-grid, .suite-grid, .steps3 { grid-template-columns: 1fr; }
+  .grid.g4 { grid-template-columns: 1fr 1fr; }
+  /* 16 px minimum : sinon l'iPhone zoome tout seul à chaque saisie */
+  input, select, textarea { font-size: 16px !important; }
+  .tip::after { width: min(250px, 70vw); }
+  .tip.tip-g::after, .tip.tip-d::after { max-width: 70vw; }
+  .tip:not(:hover):not(:focus)::after { display: none; }
+  .espaces .esp { font-size: 14px; padding: 10px 6px; }
+  /* Lignes du devis : désignation en entier, puis type et boutons, puis quantité, unité, prix, TVA, puis total */
+  .ed-head, .ed-row { grid-template-columns: 1fr 1fr 1.25fr 1fr; gap: 6px; }
+  .ed-head > :nth-child(1), .ed-head > :nth-child(2), .ed-head > :nth-child(7), .ed-head > :nth-child(8) { display: none; }
+  .ed-row > :nth-child(2) { grid-column: 1 / -1; grid-row: 1; }
+  .ed-row > :nth-child(1) { grid-column: 1 / 3; grid-row: 2; }
+  .ed-row > :nth-child(3) { grid-column: 1; grid-row: 3; }
+  .ed-row > :nth-child(4) { grid-column: 2; grid-row: 3; }
+  .ed-row > :nth-child(5) { grid-column: 3; grid-row: 3; }
+  .ed-row > :nth-child(6) { grid-column: 4; grid-row: 3; }
+  .ed-row > .ed-act { grid-column: 3 / 5; grid-row: 2; }
+  .ed-row > .ed-tot { grid-column: 1 / -1; grid-row: 4; }
+  .ed-line.is-titre .ed-row > input { grid-column: 1 / -1 !important; }
+  .ed-act button { width: 34px; height: 34px; }
+  /* Listes de la configuration (prestations, majorations) */
+  .cat-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .cat-grid > :nth-child(2) { grid-column: 1 / 4; grid-row: 1; }
+  .cat-grid > :nth-child(6) { grid-column: 4; grid-row: 1; justify-self: end; }
+  .cat-grid > :nth-child(1) { grid-column: 1; grid-row: 2; }
+  .cat-grid > :nth-child(3) { grid-column: 2; grid-row: 2; }
+  .cat-grid > :nth-child(4) { grid-column: 3; grid-row: 2; }
+  .cat-grid > :nth-child(5) { grid-column: 4; grid-row: 2; }
+  .sup-grid { grid-template-columns: 1fr 1fr 34px; }
+  .sup-grid > :nth-child(1) { grid-column: 1 / 3; grid-row: 1; }
+  .sup-grid > :nth-child(4) { grid-column: 3; grid-row: 1; }
+  .sup-grid > :nth-child(2) { grid-column: 1; grid-row: 2; }
+  .sup-grid > :nth-child(3) { grid-column: 2; grid-row: 2; }
+  .list-row.cat-grid, .list-row.sup-grid { padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
+  /* L'aperçu A4 est réduit pour tenir dans l'écran (l'impression reste en taille réelle) */
+  #doc { zoom: var(--dz, 1); }
+  /* Comptabilité : les grands tableaux défilent sur le côté, sans élargir la page */
+  .cpt-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  /* Agenda : sur téléphone, la liste « À venir » remplace la grille du mois */
+  .ag-cal { display: none; }
+  .ag-large { grid-column: auto; }
+  .ag-barre .btn { flex: 1 1 auto; }
+}
+/* Bouton « Prendre en photo » : seulement sur les écrans tactiles (téléphone, tablette) */
+.cpt-tactile { display: none !important; }
+@media (pointer: coarse) { .cpt-tactile { display: inline-block !important; } }
+
+/* ===================== MODE SOMBRE (écran uniquement : l'impression ne change pas) =====================
+   L'aperçu du devis reste blanc : c'est la feuille telle qu'elle sortira. */
+@media screen {
+  html.sombre { color-scheme: dark; }
+  html.sombre body { background: #0d1117; color: #e6edf3; }
+  html.sombre #doc { color-scheme: light; color: #1a1a1a; box-shadow: 0 0 0 1px #30363d, 0 4px 18px rgba(0,0,0,0.6); }
+  html.sombre .appbar h1, html.sombre .panel h2, html.sombre .panel h3, html.sombre .field-group > label, html.sombre .lbl, html.sombre .check, html.sombre .add-lbl,
+  html.sombre .step3 b, html.sombre .ed-head, html.sombre .ed-tot, html.sombre .list-head, html.sombre .welcome h2 { color: #8cb4ff; }
+  html.sombre .panel { background: #161b22; border-color: #2f5d8f; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+  html.sombre .panel h3 { border-bottom-color: #30363d; }
+  html.sombre .hint, html.sombre .credit, html.sombre .muted, html.sombre .welcome p { color: #9aa4b2; }
+  html.sombre a { color: #8cb4ff; }
+  html.sombre #doc a { color: inherit; }
+  html.sombre .panel input[type=text], html.sombre .panel input[type=number], html.sombre .panel input[type=date], html.sombre .panel input[type=time], html.sombre .panel input[type=email],
+  html.sombre .panel select, html.sombre .panel textarea, html.sombre .cpt input[type=text], html.sombre .cpt input[type=date], html.sombre .cpt input[type=number], html.sombre .cpt select {
+      background: #0d1117; color: #e6edf3; border-color: #3d444d; }
+  html.sombre .panel input::placeholder, html.sombre .panel textarea::placeholder { color: #6e7681; }
+  html.sombre .cpt input:disabled { background: #21262d; }
+  html.sombre .btn-light, html.sombre .tab, html.sombre .ed-act button, html.sombre .cpt-btn.cpt-sec, html.sombre .cpt-onglets button { background: #2d333b; color: #cdd9e5; }
+  html.sombre .tab.active, html.sombre .cpt-onglets button.cpt-actif { background: #2f5d8f; color: #fff; }
+  html.sombre .btn-blue, html.sombre .add-title { background: #2f5d8f; }
+  html.sombre .ed-act button.del { background: #dc3545; color: #fff; }
+  html.sombre .esp { background: #161b22; color: #8cb4ff; border-color: #2f5d8f; }
+  html.sombre .esp:hover { background: #1c2330; }
+  html.sombre .esp.active { background: #2f5d8f; color: #fff; }
+  html.sombre .pays-btn { background: #0d1117; color: #e6edf3; border-color: #3d444d; }
+  html.sombre .pays-btn.active { background: #132238; border-color: #8cb4ff; }
+  html.sombre .step3, html.sombre .box-soft, html.sombre .ed-line, html.sombre .t-acompte { background: #1c2330; border-color: #30363d; color: #e6edf3; }
+  html.sombre .ed-line.is-titre { background: #132238; border-color: #2f5d8f; }
+  html.sombre .add-zone { background: #132238; border-color: #2f5d8f; }
+  html.sombre .add-hint { color: #cdd9e5; }
+  html.sombre .suite { background: #10261a; border-color: #2e7d4f; }
+  html.sombre .suite-card { background: #161b22; border-color: #2e7d4f; color: #e6edf3; }
+  html.sombre .suite-card b { color: #7ee2a8; }
+  html.sombre .suite-note { color: #cdd9e5; }
+  html.sombre .alertes, html.sombre .note-deg, html.sombre .cgv-legende { background: #2b2111; border-color: #9e6a03; color: #f2cc60; }
+  html.sombre .alertes b { color: #ffd479; }
+  html.sombre .privacy { background: #10261a; border-color: #2e7d4f; color: #7ee2a8; }
+  html.sombre .cgv-info { background: #132238; border-color: #2f5d8f; color: #cfe3ff; }
+  html.sombre .bandeau-emise { background: #1c2330; border-color: #3d444d; color: #e6edf3; }
+  html.sombre .img-thumb { background: #fff; }
+  html.sombre .list-row.cat-grid, html.sombre .list-row.sup-grid { border-bottom-color: #30363d; }
+  html.sombre .don-boite { background: #161b22; }
+  html.sombre .don-boite p { color: #e6edf3; }
+  html.sombre .don-pied { color: #9aa4b2; }
+  /* Comptabilité */
+  html.sombre .cpt { --cpt-accent: #2f5d8f; --cpt-bord: #30363d; --cpt-fond: #1c2330; --cpt-rouge: #ff7b72; --cpt-vert: #56d364; --cpt-orange: #e3a03a; color: #e6edf3; }
+  html.sombre .cpt h2, html.sombre .cpt h3, html.sombre .cpt-titre strong, html.sombre .cpt-tuile strong, html.sombre .cpt-lien, html.sombre .cpt summary, html.sombre .cpt-split h4 { color: #8cb4ff; }
+  html.sombre .cpt-titre span, html.sombre .cpt-x, html.sombre .cpt-tuile span, html.sombre .cpt-tuile strong em, html.sombre .cpt-tuile small, html.sombre .cpt-mois, html.sombre .cpt-note, html.sombre .cpt-gris { color: #9aa4b2; }
+  html.sombre .cpt-tuile small b, html.sombre .cpt-legende, html.sombre .cpt-grille label, html.sombre .cpt-ligne label, html.sombre .cpt-sous td { color: #cdd9e5; }
+  html.sombre .cpt-tuile.cpt-tuile-plus strong, html.sombre .cpt-res-plus, html.sombre .cpt-tuile small.cpt-st-ok { color: #56d364; }
+  html.sombre .cpt-tuile.cpt-tuile-moins strong, html.sombre .cpt-res-moins { color: #ff7b72; }
+  html.sombre .cpt-tuile.cpt-tuile-sortie strong { color: #f0883e; }
+  html.sombre .cpt-tuile.cpt-tuile-att { background: #132238; border-color: #2f5d8f; }
+  html.sombre .cpt-carte, html.sombre .cpt-split { background: #161b22; }
+  html.sombre .cpt-split { border-color: #2f5d8f; }
+  html.sombre .cpt-carte.cpt-correction { background: #2b2410; border-color: #9e6a03; }
+  html.sombre .cpt-table th, html.sombre .cpt-table td { border-bottom-color: #30363d; }
+  html.sombre .cpt-table th { border-bottom-color: #2f5d8f; }
+  html.sombre .cpt-st td { background: #1f2630; }
+  html.sombre .cpt-tot td { background: #263040; }
+  html.sombre .cpt-sous td { background: #191f28; }
+  html.sombre .cpt-form td { background: #2b2410; }
+  html.sombre .cpt-tag { background: #2d333b; }
+  html.sombre .cpt-tag.cpt-vert { background: #10261a; } html.sombre .cpt-tag.cpt-orange { background: #2b2111; } html.sombre .cpt-tag.cpt-rouge { background: #2d1414; }
+  html.sombre .cpt-ok, html.sombre .cpt-prive { background: #10261a; border-color: #2e7d4f; color: #7ee2a8; }
+  html.sombre .cpt-avis, html.sombre .cpt-ocrbox { background: #132238; border-color: #2f5d8f; color: #cfe3ff; }
+  html.sombre .cpt-guide, html.sombre .cpt-memo, html.sombre .cpt-fiche { background: #1c2330; }
+  html.sombre .cpt-relances, html.sombre .cpt-rappel, html.sombre .cpt-imp { background: #2b2111; border-color: #9e6a03; color: #f2cc60; }
+  html.sombre .cpt-alerte-sauv, html.sombre .cpt-manque-msg, html.sombre .cpt-verif, html.sombre .cpt-imp.cpt-err { background: #2d1414; border-color: #c62828; color: #ffb4ab; }
+  html.sombre .cpt input.cpt-ocr, html.sombre .cpt select.cpt-ocr, html.sombre .cpt select.cpt-acat, html.sombre .cpt input.cpt-date-imp { background: #3a3000; color: #ffe08a; border-color: #e0b400; }
+  html.sombre .cpt input.cpt-manque, html.sombre .cpt select.cpt-manque, html.sombre .cpt input.cpt-date-imp.cpt-date-err { background: #3a1414; color: #ffb4ab; }
+  /* Agenda */
+  html.sombre .ag-form { background: #1c2330; border-color: #2f5d8f; }
+  html.sombre .ag-nav b, html.sombre .ag-jour-t { color: #8cb4ff; }
+  html.sombre .ag-jour-t { border-bottom-color: #30363d; }
+  html.sombre .ag-case { background: #1c2330; border-color: #30363d; }
+  html.sombre .ag-case.ag-vide { background: transparent; border-color: transparent; }
+  html.sombre .ag-case.ag-auj { border-color: #8cb4ff; }
+  html.sombre .ag-num, html.sombre .ag-tete, html.sombre .ag-plus, html.sombre .ag-gris { color: #9aa4b2; }
+  html.sombre .ag-intervention { background: #132f52; color: #cfe3ff; } html.sombre .ag-rdv { background: #2a1d4d; color: #ddd0ff; } html.sombre .ag-rappel { background: #2d333b; color: #e6edf3; }
+  html.sombre .ag-echeance { background: #10261a; color: #7ee2a8; } html.sombre .ag-relance { background: #2d1414; color: #ffb4ab; } html.sombre .ag-devis { background: #2b2111; color: #f2cc60; } html.sombre .ag-assurance { background: #0f2a27; color: #7fe0d2; }
+  html.sombre .ag-semaine { background: #132238; border-color: #2f5d8f; color: #cfe3ff; }
+  html.sombre .cpt-paire { border-bottom-color: #484f58; }
+  html.sombre .cpt-jauge i { background: #30363d; }
+  html.sombre .cpt-jauge s { background: #e6edf3; }
+}
+/* Bouton du mode sombre */
+.btn-theme { background: #2d333b; color: #fff; }
+html:not(.sombre) .btn-theme { background: #e2e8f0; color: #003366; }
 </style>
+<script>
+/* Mode sombre appliqué avant l'affichage (pas de flash blanc) : choix mémorisé, sinon réglage de l'appareil */
+(function () { try { var t = localStorage.getItem('letabli_theme'); if (t === 'sombre' || (!t && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('sombre'); } catch (e) { } })();
+</script>
 </head>
 <body>
 
@@ -409,6 +595,7 @@ table.d-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
     <h1>🧾 L'Établi <span style="font-weight:normal; font-size:15px;">: devis, factures et comptabilité gratuits</span></h1>
     <div class="btns">
         <button class="btn btn-small" style="background:#b45309;" onclick="ouvrirDon('bouton')" title="L'Établi est gratuit. Si vous en avez les moyens, un petit don aide à le faire vivre.">☕ Soutenir L'Établi</button>
+        <button class="btn btn-theme btn-small" id="btnTheme" onclick="basculerTheme()" title="Passer l'écran en sombre ou en clair (l'impression ne change pas)">🌙 Mode sombre</button>
         <button class="btn btn-light btn-small hidden" id="btnAccueil" onclick="allerAccueil()">🏠 Accueil</button>
         <button class="btn btn-light btn-small hidden" id="btnModifCfg" onclick="setMode('config')">⚙️ Modifier ma configuration</button>
         <button class="btn btn-green btn-small hidden" id="btnDlCfg" onclick="telechargerConfig()">💾 Télécharger ma configuration</button>
@@ -417,12 +604,13 @@ table.d-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
     </div>
 </div>
 <div id="noticeCfg" class="alertes no-print hidden" style="max-width:960px; margin:0 auto 14px auto;">
-    💾 Votre compteur de factures a avancé. Téléchargez votre configuration à jour : la numérotation reprendra au bon endroit, même sur un autre ordinateur.
+    <span id="noticeCfgTxt">💾 Votre compteur de factures a avancé. Téléchargez votre configuration à jour : la numérotation reprendra au bon endroit, même sur un autre ordinateur.</span>
     <button class="btn btn-green btn-small" style="margin-left:8px;" onclick="telechargerConfig()">Télécharger ma configuration</button>
 </div>
 <div class="espaces no-print hidden" id="espaces">
     <button class="esp" id="espDevis" onclick="setMode('devis')">📝 Devis et factures</button>
     <button class="esp" id="espCompta" onclick="setMode('compta')">📒 Comptabilité</button>
+    <button class="esp" id="espAgenda" onclick="setMode('agenda')">📅 Agenda</button>
 </div>
 
 <!-- ===================== ACCUEIL ===================== -->
@@ -441,7 +629,7 @@ table.d-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
             <button class="btn btn-green" onclick="document.getElementById('fileConfig').click()">📂 Charger ma configuration (.json)</button>
             <button class="btn btn-light hidden" id="btnReprendre" onclick="reprendreConfig()">↩️ Reprendre</button>
         </div>
-        <p id="lienTelecharger" class="hidden" style="text-align:center; margin:14px 0 0; font-size:14px;">💾 <a href="index.html" download="LEtabli.html"><b>Télécharger L'Établi pour l'utiliser sans internet</b></a><br><span style="color:#64748b;">Un seul fichier, « LEtabli.html », arrive dans votre dossier Téléchargements. Rangez-le où vous voulez, puis double-cliquez dessus pour l'ouvrir.</span></p>
+        <p id="lienTelecharger" class="hidden" style="text-align:center; margin:14px 0 0; font-size:14px;">💾 <a href="index.html" download="LEtabli.html"><b>Télécharger L'Établi pour l'utiliser sans internet</b></a><br><span style="color:#64748b;">Un seul fichier, « LEtabli.html », arrive dans votre dossier Téléchargements. Rangez-le où vous voulez, puis double-cliquez dessus pour l'ouvrir (sur téléphone Android : touchez-le dans vos téléchargements). Sur iPhone, ce fichier ne s'ouvre pas : utilisez plutôt le lien de ce site.</span></p>
         <label class="check" style="justify-content:center; margin-top:16px; color:#475569; font-weight:normal;">
             <input type="checkbox" id="inRemember" onchange="toggleRemember(this.checked)">
             Garder aussi ma configuration, mon dernier devis et ma comptabilité en mémoire dans ce navigateur
@@ -538,6 +726,7 @@ table.d-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
             <div class="field-group"><label>N° de contrat</label><input type="text" data-cfg="assurances.decennale.contrat"></div>
             <div class="field-group"><label>Coordonnées de l'assureur</label><input type="text" data-cfg="assurances.decennale.coordonnees" placeholder="Adresse ou téléphone de l'assureur"></div>
             <div class="field-group"><label>Couverture géographique</label><input type="text" data-cfg="assurances.decennale.zone" placeholder="Ex : France métropolitaine"></div>
+            <div class="field-group"><label>Fin de validité de l'attestation (facultatif)</label><input type="date" data-cfg="assurances.decennale.fin"><div class="hint">La date apparaît dans votre agenda, pour penser à demander la nouvelle attestation.</div></div>
         </div>
         <h3>Responsabilité civile professionnelle</h3>
         <label class="check"><input type="checkbox" data-cfg="assurances.rcpro.actif"> J'ai une RC Pro et je veux l'afficher</label>
@@ -565,6 +754,9 @@ table.d-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
     <div class="step" data-step="5">
         <h3>Vos prestations courantes</h3>
         <div class="hint" style="margin-bottom:8px;">Vous les ajouterez en un clic dans vos devis. Vous pourrez toujours modifier les prix ou saisir des lignes libres au cas par cas.</div>
+        <div class="box-soft" style="margin-bottom:10px;"><label class="lbl" for="selMetier">Partir d'un modèle de mon métier</label>
+            <div class="add-ctl"><select id="selMetier"><option value="">Choisissez votre métier...</option><option value="plomberie">Plomberie, chauffage</option><option value="electricite">Électricité</option><option value="peinture">Peinture, revêtements</option><option value="maconnerie">Maçonnerie, gros œuvre</option><option value="menuiserie">Menuiserie</option><option value="carrelage">Carrelage</option><option value="couverture">Couverture, zinguerie</option><option value="multiservices">Multiservices, dépannage</option><option value="nettoyage">Nettoyage</option><option value="espacesverts">Espaces verts, jardinage</option></select><button type="button" class="btn btn-blue btn-small" onclick="appliquerModeleMetier()">Ajouter ces prestations</button></div>
+            <div class="hint">Une dizaine de prestations courantes, prix à zéro : vous mettez les vôtres. Vous pouvez ensuite modifier, supprimer ou ajouter des lignes.</div></div>
         <div class="list-head cat-grid"><span>Type</span><span>Désignation</span><span>Unité</span><span id="lblPrixCat">Prix HT (€)</span><span>TVA</span><span></span></div>
         <div id="catalogueBox"></div>
         <button class="btn btn-light btn-small" onclick="ajouterCatalogue()">+ Ajouter une prestation</button>
@@ -732,7 +924,7 @@ table.d-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
         <div class="field-group"><label>Adresse du client</label><textarea rows="2" data-dev="clientAdresse" placeholder="Ex : 5 allée des Pins&#10;38100 Grenoble"></textarea></div>
         <div class="field-group"><label>Lieu d'intervention (si différent)</label><textarea rows="2" data-dev="chantier" placeholder="Facultatif"></textarea></div>
         <div class="field-group"><label>Objet des travaux</label><textarea rows="2" data-dev="objet" placeholder="Ex : Remplacement du chauffe-eau électrique 200 L"></textarea></div>
-        <div class="field-group" data-showdev="devis"><label>Date prévue des travaux</label><input type="text" data-dev="datePrevue" placeholder="Ex : semaine 48, ou du 02/12 au 04/12"></div>
+        <div class="field-group" data-showdev="devis"><label>Date prévue des travaux</label><input type="text" data-dev="datePrevue" placeholder="Ex : semaine 48, ou du 02/12 au 04/12"><button type="button" class="btn btn-light btn-small" style="margin-top:6px;" onclick="agendaDepuisDevis()">📅 Mettre à l'agenda</button></div>
     </div>
 
     <h3>Lignes</h3>
@@ -794,7 +986,7 @@ table.d-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
     <div class="suite hidden" id="suite"></div>
 </section>
 
-<div class="credit no-print"><strong>L'Établi par HivertLabs</strong>, logiciel gratuit (licence d'utilisation, <a href="https://github.com/hivertlabs/devis-factures-comptabilite-gratuits" target="_blank" rel="noopener">code source</a>), fourni tel quel, sans garantie. Vérifiez vos documents avant de les envoyer. <a href="#" onclick="ouvrirDon('bouton'); return false;">Soutenir le projet</a><br>Une erreur, une idée ? Écrivez à <a href="mailto:hivertlabs@hotmail.com?subject=L'%C3%89tabli">hivertlabs@hotmail.com</a></div>
+<div class="credit no-print"><strong>L'Établi par HivertLabs</strong>, logiciel gratuit (licence d'utilisation, <a href="https://github.com/hivertlabs/devis-factures-comptabilite-gratuits" target="_blank" rel="noopener">code source</a>), fourni tel quel, sans garantie. Vérifiez vos documents avant de les envoyer. <a href="#" onclick="ouvrirDon('bouton'); return false;">Soutenir le projet</a><br><a href="guides/">Guides pratiques</a> (devis, TVA, autoliquidation, impayés) · Une erreur, une idée ? Écrivez à <a href="mailto:hivertlabs@hotmail.com?subject=L'%C3%89tabli">hivertlabs@hotmail.com</a></div>
 
 <input type="file" id="fileConfig" accept=".json,application/json" class="hidden" multiple>
 <input type="file" id="fileDevis" accept=".json,application/json" class="hidden">
@@ -802,6 +994,10 @@ table.d-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
 
 <!-- ===================== LE DEVIS ===================== -->
 <!-- ===================== COMPTABILITÉ (module compta.js) ===================== -->
+<section id="screenAgenda" class="panel no-print hidden">
+    <h2>📅 Agenda</h2>
+    <div id="agendaBox"></div>
+</section>
 <section id="screenCompta" class="panel no-print hidden">
     <div id="compta"></div>
 </section>
@@ -1052,7 +1248,7 @@ function defaultConfig() {
         legal: { siret: '', immatriculation: '', tvaIntra: '', tvq: '', franchise: false, tvaDebits: false },
         apparence: { logo: '', couleur: '#003366', initiales: '', afficherNom: true },
         assurances: {
-            decennale: { actif: false, assureur: '', coordonnees: '', contrat: '', zone: 'France métropolitaine' },
+            decennale: { actif: false, assureur: '', coordonnees: '', contrat: '', zone: 'France métropolitaine', fin: '' },
             rcpro: { actif: false, assureur: '', contrat: '', coordonnees: '', zone: '' }
         },
         tva: { taux: [20, 10, 5.5], defaut: 20, mentionReduit: "Taux de TVA réduit appliqué sous réserve que les travaux portent sur un local d'habitation achevé depuis plus de 2 ans." },
@@ -1071,7 +1267,8 @@ function defaultConfig() {
             mediateurNom: '', mediateurSite: '', inclus: '', limites: '', note: '', afficherMajorations: false
         },
         signature: { signataire: '', tampon: '', signature: '' },
-        numerotation: { prefixe: 'D', prefixeFacture: 'F', factures: { annee: 0, n: 0 } }
+        numerotation: { prefixe: 'D', prefixeFacture: 'F', factures: { annee: 0, n: 0 } },
+        agenda: { evts: [], devis: {}, rappel: 'aucun' }
     };
 }
 
@@ -1127,7 +1324,7 @@ function copierTexte(t) {
 }
 function majNomPdf() {
     const h = document.getElementById('hintNomPdf');
-    if (h) h.innerHTML = `📋 Au clic, le nom du fichier <b>${nomPdf().replace(/[&<>]/g, '')}</b> est copié : si la case « Nom » de la fenêtre d'enregistrement est vide, faites <b>Ctrl+V</b> puis Entrée.`;
+    if (h) h.innerHTML = `📋 Au clic, le nom du fichier <b>${nomPdf().replace(/[&<>]/g, '')}</b> est copié : ${estTactile() ? "si la case du nom est vide, appuyez longuement dedans puis touchez <b>Coller</b>." : "si la case « Nom » de la fenêtre d'enregistrement est vide, faites <b>Ctrl+V</b> puis Entrée."}`;
 }
 
 // Fusionne un fichier chargé dans les valeurs par défaut (compatibilité avec les futures versions)
@@ -1695,6 +1892,7 @@ function noterFacture(annee, n) {
     lsSet(LS_NUMF, { annee, n });
     CFG.numerotation.factures = { annee, n };
     CFG_A_SAUVER = true;
+    $('noticeCfgTxt').textContent = '💾 Votre compteur de factures a avancé. Téléchargez votre configuration à jour : la numérotation reprendra au bon endroit, même sur un autre ordinateur.';
     $('noticeCfg').classList.remove('hidden');
     sauverPlusTard();
 }
@@ -1777,7 +1975,7 @@ function deduireFichierAcompte(data) {
 /* ----- Étape suivante : ce que l'utilisateur peut faire de ce document ----- */
 function renderSuite() {
     const box = $('suite'), t = DEV.docType || 'devis', emise = estFacture(DEV) && !!DEV.emise;
-    const carte = (titre, texte, bouton, action, cls) => `<div class="suite-card"><b>${titre}</b>${texte}<button class="btn ${cls || 'btn-green'}" onclick="${action}">${bouton}</button></div>`;
+    const carte = (titre, texte, bouton, action, cls) => `<div class="suite-card"><b>${titre}</b><span class="suite-txt">${texte}</span><button class="btn ${cls || 'btn-green'}" onclick="${action}">${bouton}</button></div>`;
     let h = '', note = '', une = false;
     if (t === 'devis') {
         const pct = num(DEV.acompte);
@@ -1788,7 +1986,7 @@ function renderSuite() {
             pct > 0 ? "Sans acompte facturé : faites la facture d'ici. Avec un acompte facturé : rouvrez plutôt le fichier de la facture d'acompte, il sera déduit tout seul."
                     : 'Reprend toutes les lignes de ce devis dans une facture.',
             'Transformer ce devis en facture', "versFacture('facture')", 'btn-blue');
-        note = 'Avant de continuer, enregistrez ce devis (.json) : il sera remplacé à l\'écran par la facture.';
+        note = 'Avant de continuer, enregistrez ce devis (.json) : il sera remplacé à l\'écran par la facture.<br>📅 Le client a signé ? <a href="#" onclick="agendaDepuisDevis(); return false;">Planifiez l\'intervention dans l\'agenda</a>.';
     } else if (t === 'acompte' && emise) {
         une = true;
         if (DEV.devisSource) {
@@ -2215,6 +2413,32 @@ function renderPaliers() {
         <button class="btn-x" data-del="1" title="Supprimer">✕</button>
     </div>`).join('');
 }
+/* Modèles de prestations par métier : désignations et unités seulement, prix à zéro (chacun fixe les siens) */
+const MODELES_METIER = {
+    plomberie: { lib: "Plomberie, chauffage", lignes: [["mo", "Main-d'œuvre plombier", "h"], ["mo", "Recherche de fuite", "forfait"], ["mo", "Débouchage de canalisation", "forfait"], ["mo", "Remplacement d'un chauffe-eau électrique", "forfait"], ["fourniture", "Chauffe-eau électrique 200 L", "u"], ["mo", "Remplacement d'un mitigeur", "u"], ["fourniture", "Mitigeur lavabo", "u"], ["mo", "Pose d'un WC suspendu", "forfait"], ["fourniture", "Bâti-support et cuvette suspendue", "u"], ["mo", "Entretien annuel de chaudière gaz", "forfait"], ["mo", "Désembouage du circuit de chauffage", "forfait"], ["fourniture", "Tube multicouche Ø16", "ml"], ["fourniture", "Raccords et petites fournitures", "forfait"], ["mo", "Mise en service et essais d'étanchéité", "forfait"]] },
+    electricite: { lib: "Électricité", lignes: [["mo", "Main-d'œuvre électricien", "h"], ["mo", "Recherche de panne", "forfait"], ["mo", "Mise en sécurité du tableau électrique", "forfait"], ["fourniture", "Tableau électrique pré-équipé", "u"], ["fourniture", "Disjoncteur divisionnaire", "u"], ["fourniture", "Interrupteur différentiel 30 mA", "u"], ["mo", "Pose d'une prise de courant", "u"], ["mo", "Pose d'un point lumineux", "u"], ["fourniture", "Câble R2V 3G2,5", "ml"], ["fourniture", "Gaine ICTA Ø20", "ml"], ["mo", "Remplacement d'un radiateur électrique", "u"], ["fourniture", "Petites fournitures électriques", "forfait"]] },
+    peinture: { lib: "Peinture, revêtements", lignes: [["mo", "Main-d'œuvre peintre", "h"], ["mo", "Protection des sols et du mobilier", "forfait"], ["mo", "Préparation des supports (rebouchage, ponçage)", "m²"], ["mo", "Impression (sous-couche)", "m²"], ["mo", "Peinture des murs, 2 couches", "m²"], ["mo", "Peinture des plafonds, 2 couches", "m²"], ["mo", "Peinture de porte ou de boiserie", "u"], ["mo", "Pose de papier peint", "m²"], ["mo", "Pose de toile de verre", "m²"], ["fourniture", "Peinture acrylique", "L"], ["fourniture", "Enduit de rebouchage", "kg"], ["mo", "Nettoyage de fin de chantier", "forfait"]] },
+    maconnerie: { lib: "Maçonnerie, gros œuvre", lignes: [["mo", "Main-d'œuvre maçon", "h"], ["mo", "Terrassement", "m³"], ["mo", "Démolition de cloison ou de mur", "m²"], ["autre", "Location de benne", "u"], ["mo", "Coulage de dalle béton", "m²"], ["fourniture", "Béton prêt à l'emploi", "m³"], ["mo", "Montage de mur en parpaings", "m²"], ["fourniture", "Parpaings 20 x 20 x 50", "u"], ["fourniture", "Sac de ciment 35 kg", "u"], ["mo", "Ouverture de mur porteur avec linteau", "forfait"], ["mo", "Enduit de façade", "m²"], ["autre", "Évacuation des gravats", "forfait"]] },
+    menuiserie: { lib: "Menuiserie", lignes: [["mo", "Main-d'œuvre menuisier", "h"], ["mo", "Pose d'une porte intérieure", "u"], ["fourniture", "Bloc-porte intérieur", "u"], ["mo", "Pose d'une fenêtre en rénovation", "u"], ["fourniture", "Fenêtre PVC double vitrage", "u"], ["mo", "Pose de parquet flottant", "m²"], ["fourniture", "Parquet flottant", "m²"], ["fourniture", "Sous-couche acoustique", "m²"], ["mo", "Pose de plinthes", "ml"], ["mo", "Fabrication et pose de placard sur mesure", "forfait"], ["mo", "Réglage ou remplacement de quincaillerie", "u"], ["fourniture", "Quincaillerie", "forfait"]] },
+    carrelage: { lib: "Carrelage", lignes: [["mo", "Main-d'œuvre carreleur", "h"], ["mo", "Dépose de l'ancien revêtement", "m²"], ["mo", "Ragréage du sol", "m²"], ["fourniture", "Ragréage", "kg"], ["mo", "Pose de carrelage au sol", "m²"], ["mo", "Pose de faïence murale", "m²"], ["fourniture", "Carrelage", "m²"], ["fourniture", "Colle à carrelage", "kg"], ["fourniture", "Joint", "kg"], ["mo", "Pose de plinthes carrelées", "ml"], ["mo", "Étanchéité sous carrelage (douche)", "m²"], ["mo", "Joints et finitions", "forfait"]] },
+    couverture: { lib: "Couverture, zinguerie", lignes: [["mo", "Main-d'œuvre couvreur", "h"], ["mo", "Recherche de fuite en toiture", "forfait"], ["mo", "Remplacement de tuiles cassées", "u"], ["fourniture", "Tuiles", "u"], ["mo", "Démoussage et traitement de toiture", "m²"], ["mo", "Nettoyage des gouttières", "ml"], ["mo", "Remplacement de gouttière en zinc", "ml"], ["fourniture", "Gouttière en zinc", "ml"], ["mo", "Réfection de faîtage", "ml"], ["mo", "Pose d'écran sous-toiture", "m²"], ["autre", "Location d'échafaudage", "jour"], ["mo", "Installation de chantier et sécurité", "forfait"]] },
+    multiservices: { lib: "Multiservices, dépannage", lignes: [["mo", "Main-d'œuvre", "h"], ["mo", "Diagnostic sur place", "forfait"], ["mo", "Petits travaux de plomberie", "h"], ["mo", "Petits travaux d'électricité", "h"], ["mo", "Montage de meubles", "h"], ["mo", "Pose d'étagère, de tringle ou de luminaire", "u"], ["mo", "Remplacement de serrure ou de cylindre", "u"], ["fourniture", "Cylindre de serrure", "u"], ["mo", "Rebouchage et retouches de peinture", "h"], ["fourniture", "Petites fournitures", "forfait"], ["autre", "Évacuation des déchets en déchetterie", "forfait"]] },
+    nettoyage: { lib: "Nettoyage", lignes: [["mo", "Main-d'œuvre agent d'entretien", "h"], ["mo", "Nettoyage de bureaux", "h"], ["mo", "Nettoyage de fin de chantier", "m²"], ["mo", "Nettoyage de vitres", "m²"], ["mo", "Remise en état après déménagement", "forfait"], ["mo", "Entretien des parties communes", "h"], ["mo", "Shampooing de moquette", "m²"], ["fourniture", "Produits d'entretien", "forfait"]] },
+    espacesverts: { lib: "Espaces verts, jardinage", lignes: [["mo", "Main-d'œuvre jardinier", "h"], ["mo", "Tonte de pelouse", "m²"], ["mo", "Taille de haie", "ml"], ["mo", "Débroussaillage", "m²"], ["mo", "Élagage d'arbre", "u"], ["mo", "Abattage d'arbre", "u"], ["mo", "Ramassage des feuilles", "h"], ["mo", "Création de massif", "m²"], ["fourniture", "Plants et végétaux", "u"], ["fourniture", "Paillage", "m³"], ["autre", "Évacuation des déchets verts", "m³"]] }
+};
+function appliquerModeleMetier() {
+    const k = $('selMetier').value, m = MODELES_METIER[k];
+    if (!m) { alert('Choisissez votre métier dans la liste.'); return; }
+    const deja = new Set(CFG.catalogue.map(x => String(x.lib || '').trim().toLowerCase()));
+    const nouvelles = m.lignes.filter(([, lib]) => !deja.has(lib.toLowerCase()));
+    if (!nouvelles.length) { alert('Ces prestations sont déjà dans votre liste.'); return; }
+    if (!confirm(`Ajouter ${nouvelles.length} prestation(s) « ${m.lib} » à votre liste ?\n\nVos prestations actuelles sont gardées. Les prix sont à zéro : mettez les vôtres, ligne par ligne.`)) return;
+    // Une liste qui ne contient que la ligne d'exemple de départ (« Main-d'œuvre ») est remplacée
+    const d0 = defaultConfig().catalogue[0], c0 = CFG.catalogue[0];
+    if (CFG.catalogue.length === 1 && c0 && String(c0.lib || '').trim() === d0.lib && num(c0.pu) === num(d0.pu) && (c0.unite || '') === d0.unite) CFG.catalogue = [];
+    nouvelles.forEach(([type, lib, unite]) => CFG.catalogue.push({ type, lib, unite, pu: 0, tva: '' }));
+    renderCatalogue(); onCfg();
+}
 function ajouterCatalogue() { CFG.catalogue.push({ type: 'fourniture', lib: '', unite: 'u', pu: 0, tva: '' }); renderCatalogue(); onCfg(); }
 function ajouterSupplement() { CFG.supplements.push({ lib: '', mode: 'pct', valeur: 0 }); renderSupplements(); onCfg(); }
 function ajouterPalier() { CFG.degressif.paliers.push({ seuil: 0, remise: 0 }); renderPaliers(); onCfg(); }
@@ -2313,9 +2537,26 @@ function champsManquants() {
 }
 
 // Configuration + dossier comptable ouvert, en un clic (deux fichiers aux noms assortis)
+// Téléphone et tablette : deux téléchargements d'affilée peuvent être bloqués, donc un appui par fichier
+function estTactile() { return !!(window.matchMedia && matchMedia('(pointer: coarse)').matches); }
+let etapeTout = 0;
+function majBtnTout() {
+    const b = document.getElementById('btnTout'); if (!b) return;
+    const compta = !!(window.LetabliCompta && LetabliCompta.dossierOuvert());
+    if (estTactile() && compta) {
+        b.textContent = etapeTout === 1 ? "💾 Étape 2 sur 2 : enregistrer la compta de l'entreprise" : "💾 Étape 1 sur 2 : enregistrer la configuration de l'entreprise";
+    } else { etapeTout = 0; b.textContent = '💾 Tout enregistrer'; }
+}
 function toutEnregistrer() {
+    const compta = !!(window.LetabliCompta && LetabliCompta.dossierOuvert());
+    if (estTactile() && compta) {
+        if (etapeTout === 1) { LetabliCompta.enregistrer(); etapeTout = 0; }
+        else { telechargerConfig(); etapeTout = 1; }
+        majBtnTout();
+        return;
+    }
     telechargerConfig();
-    if (window.LetabliCompta && LetabliCompta.dossierOuvert()) setTimeout(() => LetabliCompta.enregistrer(), 500);
+    if (compta) setTimeout(() => LetabliCompta.enregistrer(), 500);
 }
 function telechargerConfig() {
     const data = JSON.parse(JSON.stringify(CFG));
@@ -2347,19 +2588,23 @@ function setMode(m) {
     $('screenConfig').classList.toggle('hidden', m !== 'config');
     $('screenDevis').classList.toggle('hidden', m !== 'devis');
     $('screenCompta').classList.toggle('hidden', m !== 'compta');
-    $('doc').classList.toggle('hidden', m === 'accueil' || m === 'compta');
-    $('espaces').classList.toggle('hidden', m !== 'devis' && m !== 'compta');
+    $('screenAgenda').classList.toggle('hidden', m !== 'agenda');
+    $('doc').classList.toggle('hidden', m === 'accueil' || m === 'compta' || m === 'agenda');
+    $('espaces').classList.toggle('hidden', m !== 'devis' && m !== 'compta' && m !== 'agenda');
     $('espDevis').classList.toggle('active', m === 'devis');
     $('espCompta').classList.toggle('active', m === 'compta');
+    $('espAgenda').classList.toggle('active', m === 'agenda');
     $('btnAccueil').classList.toggle('hidden', m === 'accueil');
-    $('btnModifCfg').classList.toggle('hidden', m !== 'devis' && m !== 'compta');
+    $('btnModifCfg').classList.toggle('hidden', m !== 'devis' && m !== 'compta' && m !== 'agenda');
     $('btnDlCfg').classList.toggle('hidden', m !== 'config');
-    $('btnTout').classList.toggle('hidden', m !== 'devis' && m !== 'compta');
+    $('btnTout').classList.toggle('hidden', m !== 'devis' && m !== 'compta' && m !== 'agenda');
+    majBtnTout();
     $('btnVersDevis').classList.toggle('hidden', m !== 'config');
     if (m === 'config') { remplirConfigForm(); allerEtape(STEP); }
     if (m === 'devis') { remplirDevisForm(); renderEditeur(); }
     if (m === 'accueil') majAccueil();
     if (m === 'compta') ouvrirCompta();
+    if (m === 'agenda') renderAgenda();
     if (m !== 'accueil') renderDoc();
     $('doc').classList.toggle('demo', m === 'devis' && !!DEV.demo);
     $('noticeCfg').classList.toggle('hidden', !CFG_A_SAUVER || m === 'accueil');
@@ -2442,10 +2687,307 @@ function effacerSignatureClient() { if (ctxClient) ctxClient.clearRect(0, 0, can
 /* =====================================================================
    IMPRESSION
    ===================================================================== */
+/* =====================================================================
+   AGENDA : interventions, rendez-vous et rappels, rangés dans le fichier de configuration.
+   S'y ajoutent tout seuls : échéances et relances (compta), fin de validité des devis imprimés,
+   fin de l'attestation décennale. Envoi vers l'agenda du téléphone au format .ics.
+   ===================================================================== */
+const AG_TYPES = {
+    intervention: { lib: 'Intervention', ico: '🔧' },
+    rdv: { lib: 'Rendez-vous', ico: '👀' },
+    rappel: { lib: 'Rappel', ico: '📌' },
+    echeance: { lib: 'Échéance de paiement', ico: '💶', auto: true },
+    relance: { lib: 'Relance', ico: '🔔', auto: true },
+    devis: { lib: 'Fin de validité du devis', ico: '📄', auto: true },
+    assurance: { lib: 'Assurance', ico: '🛡️', auto: true }
+};
+const AG_MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+const AG_JOURS = ['lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.', 'dim.'];
+const AG = { mois: todayISO().slice(0, 7), edit: null };
+
+function agData() {
+    if (!CFG.agenda || typeof CFG.agenda !== 'object') CFG.agenda = {};
+    const a = CFG.agenda;
+    if (!Array.isArray(a.evts)) a.evts = [];
+    if (!a.devis || typeof a.devis !== 'object' || Array.isArray(a.devis)) a.devis = {};
+    if (!['aucun', 'veille', '1h'].includes(a.rappel)) a.rappel = 'aucun';
+    return a;
+}
+const agIso = s => /^\d{4}-\d{2}-\d{2}$/.test(s || '');
+function agJourLong(iso) {
+    const d = new Date(iso + 'T12:00:00');
+    return `${AG_JOURS[(d.getDay() + 6) % 7]} ${d.getDate()} ${AG_MOIS[d.getMonth()]}${iso.slice(0, 4) !== todayISO().slice(0, 4) ? ' ' + iso.slice(0, 4) : ''}`;
+}
+function agModifie() {
+    CFG_A_SAUVER = true;
+    const n = $('noticeCfgTxt');
+    if (n) n.textContent = "💾 Votre agenda a changé. Il est rangé dans votre configuration : enregistrez-la (bouton « Tout enregistrer » ou ci-contre) pour ne pas perdre vos rendez-vous.";
+    $('noticeCfg').classList.remove('hidden');
+    sauverPlusTard();
+}
+
+// Tous les événements, ceux saisis et ceux calculés. Chaque événement : { uid, type, titre, debut, fin, heure, ... }
+function agEvenements() {
+    const a = agData(), L = [];
+    a.evts.forEach(e => { if (agIso(e.debut)) L.push({ ...e, uid: e.id, fin: agIso(e.fin) && e.fin >= e.debut ? e.fin : e.debut }); });
+    Object.entries(a.devis).forEach(([n, d]) => {
+        if (agIso(d.fin)) L.push({ uid: 'devis-' + n, type: 'devis', titre: `Devis ${n} : fin de validité`, debut: d.fin, fin: d.fin, client: d.client || '', note: d.objet || '', devis: n });
+    });
+    const dec = CFG.assurances && CFG.assurances.decennale;
+    if (dec && dec.actif && agIso(dec.fin)) L.push({ uid: 'decennale', type: 'assurance', titre: 'Fin de l\'attestation décennale', debut: dec.fin, fin: dec.fin, note: dec.assureur ? 'Assureur : ' + dec.assureur : '' });
+    try {
+        if (window.LetabliCompta && LetabliCompta.evenementsAgenda) LetabliCompta.evenementsAgenda().forEach(x => L.push({ ...x, fin: x.debut }));
+    } catch (e) { }
+    return L.sort((x, y) => x.debut.localeCompare(y.debut) || (x.heure || '99').localeCompare(y.heure || '99'));
+}
+const agTouche = (e, iso) => e.debut <= iso && e.fin >= iso;
+
+// Plus de 2 relances le même jour : une seule ligne qui renvoie vers la compta (le fichier .ics, lui, les garde une par une)
+function agRegrouper(ev, iso) {
+    const rel = ev.filter(e => e.type === 'relance');
+    if (rel.length <= 2) return ev;
+    const total = rel.reduce((t, e) => t + (e.reste || 0), 0);
+    return [{ uid: '__relances', type: 'relance', titre: `${rel.length} factures à relancer`, debut: iso, fin: iso, client: rel.slice(0, 3).map(e => e.client).filter(Boolean).join(', ') + (rel.length > 3 ? '...' : '') }, ...ev.filter(e => e.type !== 'relance')];
+}
+function agPuce(e) {
+    const t = AG_TYPES[e.type] || AG_TYPES.rappel;
+    return `<button class="ag-puce ag-${esc(e.type)}" onclick="agOuvrir('${esc(e.uid)}')" title="${esc(t.lib + ' : ' + e.titre)}">${t.ico} ${e.heure ? esc(e.heure) + ' ' : ''}${esc(e.titre)}</button>`;
+}
+
+function renderAgenda() {
+    const box = $('agendaBox'); if (!box) return;
+    const a = agData(), tous = agEvenements(), auj = todayISO();
+    // Grille du mois (lundi en premier)
+    const [y, m] = AG.mois.split('-').map(Number);
+    const premier = new Date(y, m - 1, 1), decal = (premier.getDay() + 6) % 7, nbJ = new Date(y, m, 0).getDate();
+    let cases = '';
+    for (let i = 0; i < decal; i++) cases += '<div class="ag-case ag-vide"></div>';
+    for (let j = 1; j <= nbJ; j++) {
+        const iso = `${AG.mois}-${String(j).padStart(2, '0')}`, ev = agRegrouper(tous.filter(e => agTouche(e, iso)), iso);
+        cases += `<div class="ag-case${iso === auj ? ' ag-auj' : ''}" ondblclick="agNouveau('intervention','${iso}')"><div class="ag-num">${j}</div>${ev.slice(0, 4).map(agPuce).join('')}${ev.length > 4 ? `<div class="ag-plus">+ ${ev.length - 4} autre(s)</div>` : ''}</div>`;
+    }
+    // À venir : les 60 prochains jours, groupés par jour
+    const limite = addDays(auj, 60), venir = tous.filter(e => e.fin >= auj && e.debut <= limite);
+    const jours = [];
+    venir.forEach(e => { const j = e.debut < auj ? auj : e.debut; let g = jours.find(x => x.j === j); if (!g) jours.push(g = { j, ev: [] }); g.ev.push(e); });
+    jours.sort((p, q) => p.j.localeCompare(q.j));
+    jours.forEach(g => { g.ev = agRegrouper(g.ev, g.j); });
+    const liste = jours.length ? jours.map(g => `<div class="ag-jour"><div class="ag-jour-t">${g.j === auj ? "Aujourd'hui" : g.j === addDays(auj, 1) ? 'Demain' : agJourLong(g.j)}</div>${g.ev.map(e => {
+        const t = AG_TYPES[e.type] || AG_TYPES.rappel, plusJ = e.fin > e.debut ? ` <span class="ag-gris">(jusqu'au ${agJourLong(e.fin)})</span>` : '';
+        const det = [e.client, e.lieu, e.devis && e.type !== 'devis' ? 'devis ' + e.devis : ''].filter(Boolean).map(esc).join(' · ');
+        return `<div class="ag-ligne ag-${esc(e.type)}" onclick="agOuvrir('${esc(e.uid)}')"><span class="ag-ico">${t.ico}</span><div><b>${e.heure ? esc(e.heure) + ' · ' : ''}${esc(e.titre)}</b>${plusJ}${det ? `<br><span class="ag-gris">${det}</span>` : ''}</div></div>`;
+    }).join('')}</div>`).join('') : '<p class="ag-gris">Rien de prévu dans les 60 prochains jours.</p>';
+
+    box.innerHTML = `
+    <div class="ag-barre">
+        <div class="ag-ajout">
+            <button class="btn btn-blue btn-small" onclick="agNouveau('intervention')">🔧 + Intervention</button>
+            <button class="btn btn-blue btn-small" onclick="agNouveau('rdv')">👀 + Rendez-vous</button>
+            <button class="btn btn-blue btn-small" onclick="agNouveau('rappel')">📌 + Rappel</button>
+        </div>
+        <button class="btn btn-green btn-small" onclick="agExporterTout()">📲 Envoyer tout l'agenda vers mon téléphone</button>
+    </div>
+    ${AG.edit ? agFormulaire() : ''}
+    <div class="ag-cal">
+        <div class="ag-nav"><button class="btn btn-light btn-small" onclick="agMois(-1)">◀</button><b>${AG_MOIS[m - 1]} ${y}</b><button class="btn btn-light btn-small" onclick="agMois(1)">▶</button><button class="btn btn-light btn-small" onclick="agMois(0)">Aujourd'hui</button></div>
+        <div class="ag-grille">${AG_JOURS.map(j => `<div class="ag-tete">${j}</div>`).join('')}${cases}</div>
+        <div class="hint">Double-cliquez sur un jour pour y ajouter une intervention.</div>
+    </div>
+    <h3>À venir</h3>
+    <div class="ag-liste">${liste}</div>
+    <h3>Envoi vers le téléphone</h3>
+    <div class="field-group" style="max-width:420px;"><label>Rappel dans l'agenda du téléphone</label>
+        <select onchange="agData().rappel=this.value; agModifie();">
+            <option value="aucun"${a.rappel === 'aucun' ? ' selected' : ''}>Aucun rappel</option>
+            <option value="veille"${a.rappel === 'veille' ? ' selected' : ''}>La veille à 18 h</option>
+            <option value="1h"${a.rappel === '1h' ? ' selected' : ''}>1 heure avant (la veille à 18 h si pas d'heure)</option>
+        </select></div>
+    <div class="hint">Le bouton « Envoyer » crée un fichier .ics, le format que lisent tous les agendas. <b>iPhone</b> : touchez le fichier, puis « Tout ajouter ». <b>Outlook</b> : ouvrez le fichier. <b>Google Agenda</b> : sur ordinateur, calendar.google.com, Paramètres, « Importer ». Ce n'est pas une synchronisation : après une modification, renvoyez le fichier. L'iPhone et Outlook mettent alors à jour les rendez-vous déjà envoyés ; Google Agenda peut les dupliquer.</div>
+    <div class="hint">Vos interventions, rendez-vous et rappels sont rangés dans votre fichier de configuration : pensez à l'enregistrer. Les échéances et relances viennent du dossier comptable ouvert, la fin de validité des devis s'ajoute quand vous imprimez un devis.</div>`;
+}
+
+function agMois(pas) {
+    if (!pas) AG.mois = todayISO().slice(0, 7);
+    else { const [y, m] = AG.mois.split('-').map(Number), d = new Date(y, m - 1 + pas, 1); AG.mois = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; }
+    renderAgenda();
+}
+function agNouveau(type, iso, extra) {
+    AG.edit = { id: '', type, titre: '', debut: iso || todayISO(), fin: '', heure: '', client: '', lieu: '', devis: '', note: '', ...(extra || {}) };
+    if (MODE !== 'agenda') setMode('agenda'); else renderAgenda();
+    const f = document.getElementById('agForm'); if (f) f.scrollIntoView({ block: 'center' });
+}
+function agOuvrir(uid) {
+    if (uid === '__relances') { AG.edit = null; setMode('compta'); return; }
+    const e = agEvenements().find(x => x.uid === uid); if (!e) return;
+    AG.edit = AG_TYPES[e.type] && AG_TYPES[e.type].auto ? { ...e, lectureSeule: true } : { ...agData().evts.find(x => x.id === uid) };
+    renderAgenda();
+    const f = document.getElementById('agForm'); if (f) f.scrollIntoView({ block: 'center' });
+}
+function agFormulaire() {
+    const e = AG.edit, t = AG_TYPES[e.type] || AG_TYPES.rappel;
+    if (e.lectureSeule) {
+        const actions = e.type === 'devis' ? `<button class="btn btn-light btn-small" onclick="agRetirerDevis('${esc(e.devis)}')">Le client a répondu : retirer</button>`
+            : (e.type === 'relance' || e.type === 'echeance') ? `<button class="btn btn-light btn-small" onclick="AG.edit=null; setMode('compta')">Voir dans la comptabilité</button>`
+            : `<button class="btn btn-light btn-small" onclick="AG.edit=null; setMode('config'); allerEtape(3)">Modifier dans la configuration</button>`;
+        return `<div class="ag-form" id="agForm"><h3>${t.ico} ${esc(t.lib)}</h3><p><b>${esc(e.titre)}</b> : ${agJourLong(e.debut)}</p>${e.client ? `<p>${esc(e.client)}</p>` : ''}${e.note ? `<p class="ag-gris">${esc(e.note)}</p>` : ''}
+            <p class="hint">Cette date est calculée par L'Établi, elle ne se modifie pas ici.</p>
+            <div class="ag-btns">${actions}<button class="btn btn-light btn-small" onclick="AG.edit=null; renderAgenda()">Fermer</button></div></div>`;
+    }
+    const opt = ['intervention', 'rdv', 'rappel'].map(k => `<option value="${k}"${e.type === k ? ' selected' : ''}>${AG_TYPES[k].ico} ${AG_TYPES[k].lib}</option>`).join('');
+    return `<div class="ag-form" id="agForm"><h3>${e.id ? 'Modifier' : 'Ajouter'} : ${t.ico} ${esc(t.lib)}</h3>
+        <div class="grid g3">
+            <div class="field-group"><label>Type</label><select id="agType">${opt}</select></div>
+            <div class="field-group ag-large"><label>Quoi <span class="req">*</span></label><input type="text" id="agTitre" value="${esc(e.titre)}" placeholder="Ex : Remplacement chauffe-eau"></div>
+            <div class="field-group"><label>Le <span class="req">*</span></label><input type="date" id="agDebut" value="${esc(e.debut)}"></div>
+            <div class="field-group"><label>Jusqu'au (plusieurs jours)</label><input type="date" id="agFin" value="${esc(e.fin && e.fin !== e.debut ? e.fin : '')}"></div>
+            <div class="field-group"><label>Heure (facultatif)</label><input type="time" id="agHeure" value="${esc(e.heure)}"></div>
+            <div class="field-group"><label>Client</label><input type="text" id="agClient" value="${esc(e.client)}"></div>
+            <div class="field-group"><label>Lieu</label><input type="text" id="agLieu" value="${esc(e.lieu)}" placeholder="Adresse du chantier"></div>
+            <div class="field-group"><label>N° de devis</label><input type="text" id="agDevis" value="${esc(e.devis)}"></div>
+        </div>
+        <div class="field-group"><label>Note</label><textarea id="agNote" rows="2">${esc(e.note)}</textarea></div>
+        <div class="ag-btns">
+            <button class="btn btn-green btn-small" onclick="agEnregistrer()">✔️ Enregistrer</button>
+            ${e.id ? `<button class="btn btn-light btn-small" onclick="agExporterUn('${esc(e.id)}')">📲 Envoyer vers mon téléphone</button><button class="btn btn-red btn-small" onclick="agSupprimer('${esc(e.id)}')">Supprimer</button>` : ''}
+            <button class="btn btn-light btn-small" onclick="AG.edit=null; renderAgenda()">Annuler</button>
+        </div></div>`;
+}
+function agEnregistrer() {
+    const v = id => (document.getElementById(id).value || '').trim();
+    const e = { id: AG.edit.id || ('e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)), type: v('agType'), titre: v('agTitre'), debut: v('agDebut'), fin: v('agFin'), heure: v('agHeure'), client: v('agClient'), lieu: v('agLieu'), devis: v('agDevis'), note: v('agNote') };
+    if (!e.titre) { alert('Indiquez ce qui est prévu (case « Quoi »).'); return; }
+    if (!agIso(e.debut)) { alert('Indiquez la date.'); return; }
+    if (e.fin && (!agIso(e.fin) || e.fin < e.debut)) { alert('La date de fin doit être après la date de début.'); return; }
+    if (e.fin === e.debut) e.fin = '';
+    const a = agData(), i = a.evts.findIndex(x => x.id === e.id);
+    if (i >= 0) a.evts[i] = e; else a.evts.push(e);
+    AG.edit = null; AG.mois = e.debut.slice(0, 7);
+    agModifie(); renderAgenda();
+}
+function agSupprimer(id) {
+    if (!confirm('Supprimer ce rendez-vous de l\'agenda ?')) return;
+    const a = agData(); a.evts = a.evts.filter(x => x.id !== id);
+    AG.edit = null; agModifie(); renderAgenda();
+}
+function agRetirerDevis(n) { delete agData().devis[n]; AG.edit = null; agModifie(); renderAgenda(); }
+
+// Devis imprimé : sa fin de validité entre dans l'agenda (un devis réimprimé remplace la date)
+function agNoterDevis() {
+    if (MODE !== 'devis' || (DEV.docType || 'devis') !== 'devis' || DEV.demo || !DEV.numero || !agIso(DEV.date)) return;
+    const fin = addDays(DEV.date, Math.max(1, num(CFG.conditions.validite) || 30)), a = agData();
+    const avant = a.devis[DEV.numero];
+    if (avant && avant.fin === fin && avant.client === (DEV.clientNom || '')) return;
+    a.devis[DEV.numero] = { fin, client: DEV.clientNom || '', objet: DEV.objet || '' };
+    // On ne garde pas les devis expirés depuis plus de 60 jours
+    const vieux = addDays(todayISO(), -60);
+    Object.keys(a.devis).forEach(k => { if (!agIso(a.devis[k].fin) || a.devis[k].fin < vieux) delete a.devis[k]; });
+    agModifie();
+}
+// Bouton « Mettre à l'agenda » du devis : reprend le client, le lieu, l'objet et les dates écrites dans « Date prévue des travaux »
+function agendaDepuisDevis() {
+    const auj = todayISO(), dates = [];
+    String(DEV.datePrevue || '').replace(/(\d{1,2})[\/.](\d{1,2})(?:[\/.](\d{2,4}))?/g, (_, j, mo, an) => {
+        let y = an ? (an.length === 2 ? 2000 + +an : +an) : +auj.slice(0, 4);
+        let iso = `${y}-${String(mo).padStart(2, '0')}-${String(j).padStart(2, '0')}`;
+        if (!an && iso < auj) iso = `${y + 1}${iso.slice(4)}`;
+        if (agIso(iso) && !isNaN(new Date(iso + 'T12:00:00'))) dates.push(iso);
+    });
+    agNouveau('intervention', dates[0] || '', {
+        titre: DEV.objet || 'Intervention', fin: dates[1] && dates[1] > dates[0] ? dates[1] : '',
+        client: DEV.clientNom || '', lieu: DEV.chantier || String(DEV.clientAdresse || '').replace(/\s*\n\s*/g, ', '),
+        devis: DEV.docType === 'devis' ? DEV.numero || '' : DEV.devisRef || '', note: DEV.datePrevue ? 'Prévu au devis : ' + DEV.datePrevue : ''
+    });
+    if (!dates[0]) { const d = document.getElementById('agDebut'); if (d) { d.value = ''; d.focus(); } }
+}
+// Encadré « Cette semaine » du tableau de bord de la compta (interventions, rendez-vous, rappels, devis qui expirent)
+function agendaSemaineHTML() {
+    if (!CFG || !CFG.agenda) return '';
+    const auj = todayISO(), fin = addDays(auj, 7);
+    const L = agEvenements().filter(e => e.type !== 'relance' && e.type !== 'echeance' && e.fin >= auj && e.debut <= fin);
+    if (!L.length) return '';
+    return `<div class="ag-semaine"><h3>📅 Cette semaine</h3><ul>${L.slice(0, 8).map(e => `<li><b>${e.debut <= auj ? "Aujourd'hui" : agJourLong(e.debut)}</b>${e.heure ? ' ' + esc(e.heure) : ''} · ${(AG_TYPES[e.type] || {}).ico || ''} ${esc(e.titre)}${e.client ? ' · ' + esc(e.client) : ''}</li>`).join('')}</ul><button class="cpt-btn cpt-sec" onclick="setMode('agenda')">Ouvrir l'agenda</button></div>`;
+}
+
+/* ----- Export .ics (RFC 5545) ----- */
+function icsTexte(s) { return String(s || '').replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
+function icsPlier(ligne) {
+    const enc = new TextEncoder(); let out = '', cur = '', n = 0;
+    for (const ch of ligne) {
+        const b = enc.encode(ch).length;
+        if (n + b > (out ? 74 : 75)) { out += (out ? '\r\n ' : '') + cur; cur = ''; n = 0; }
+        cur += ch; n += b;
+    }
+    return out + (out ? '\r\n ' : '') + cur;
+}
+function icsEvt(e, alarme, stamp, seq) {
+    const d = iso => iso.replace(/-/g, '');
+    const L = ['BEGIN:VEVENT', `UID:${e.uid}@letabli`, `DTSTAMP:${stamp}`, `SEQUENCE:${seq}`];
+    if (e.heure && /^\d{2}:\d{2}$/.test(e.heure) && e.fin === e.debut) {
+        const debut = d(e.debut) + 'T' + e.heure.replace(':', '') + '00';
+        const [h, mi] = e.heure.split(':').map(Number), finH = Math.min(23, h + 1);
+        L.push(`DTSTART:${debut}`, `DTEND:${d(e.debut)}T${String(finH).padStart(2, '0')}${String(finH === h + 1 ? mi : 59).padStart(2, '0')}00`);
+    } else {
+        L.push(`DTSTART;VALUE=DATE:${d(e.debut)}`, `DTEND;VALUE=DATE:${d(addDays(e.fin || e.debut, 1))}`);
+    }
+    const t = AG_TYPES[e.type] || AG_TYPES.rappel;
+    L.push('SUMMARY:' + icsTexte(`${t.ico} ${e.titre}${e.client ? ' · ' + e.client : ''}`));
+    if (e.lieu) L.push('LOCATION:' + icsTexte(e.lieu));
+    const desc = [t.lib, e.client && 'Client : ' + e.client, e.devis && 'Devis : ' + e.devis, e.note].filter(Boolean).join('\n');
+    L.push('DESCRIPTION:' + icsTexte(desc + "\n(envoyé depuis L'Établi)"));
+    if (alarme !== 'aucun') {
+        const trig = alarme === '1h' && e.heure && e.fin === e.debut ? '-PT1H' : (e.heure && e.fin === e.debut ? `-PT${Number(e.heure.slice(0, 2)) * 60 + Number(e.heure.slice(3)) + 360}M` : '-PT6H');
+        L.push('BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + icsTexte(e.titre), 'TRIGGER:' + trig, 'END:VALARM');
+    }
+    L.push('END:VEVENT');
+    return L;
+}
+function icsFichier(liste, nom) {
+    const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''), seq = Math.floor(Date.now() / 60000) - 29000000, al = agData().rappel;
+    const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', "PRODID:-//HivertLabs//L'Etabli//FR", 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH'];
+    liste.forEach(e => L.push(...icsEvt(e, al, stamp, seq)));
+    L.push('END:VCALENDAR');
+    const blob = new Blob([L.map(icsPlier).join('\r\n') + '\r\n'], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = nom;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function agExporterTout() {
+    const auj = todayISO(), L = agEvenements().filter(e => e.fin >= auj);
+    if (!L.length) { alert('Rien à envoyer : aucun rendez-vous à venir.'); return; }
+    icsFichier(L, 'agenda_' + nomFichier(String(CFG.entreprise.raisonSociale || '').normalize('NFD').replace(/[\u0300-\u036f]/g, ''), 'L_Etabli') + '.ics');
+}
+function agExporterUn(id) {
+    const e = agEvenements().find(x => x.uid === id); if (!e) return;
+    icsFichier([e], 'rdv_' + e.debut + '_' + nomFichier(String(e.titre).normalize('NFD').replace(/[\u0300-\u036f]/g, '').slice(0, 30), 'agenda') + '.ics');
+}
+
+/* Mode sombre : bouton en haut, choix mémorisé dans ce navigateur */
+function majBtnTheme() {
+    const b = document.getElementById('btnTheme'); if (!b) return;
+    b.textContent = document.documentElement.classList.contains('sombre') ? '☀️ Mode clair' : '🌙 Mode sombre';
+}
+function basculerTheme() {
+    const sombre = document.documentElement.classList.toggle('sombre');
+    try { localStorage.setItem('letabli_theme', sombre ? 'sombre' : 'clair'); } catch (e) { }
+    majBtnTheme();
+}
+document.addEventListener('DOMContentLoaded', majBtnTheme);
+majBtnTheme();
+/* Téléphone : réduit l'aperçu A4 à la largeur de l'écran (sans effet sur l'impression) */
+function majZoomDoc() {
+    const d = document.getElementById('doc'); if (!d) return;
+    const dispo = document.documentElement.clientWidth - 16;
+    d.style.setProperty('--dz', Math.min(1, dispo / 794).toFixed(3));
+}
+window.addEventListener('resize', majZoomDoc);
+window.addEventListener('orientationchange', majZoomDoc);
+document.addEventListener('DOMContentLoaded', majZoomDoc);
+majZoomDoc();
 let titreAvant = document.title;
 window.addEventListener('beforeprint', () => {
     titreAvant = document.title;
-    if (MODE === 'devis') { document.title = nomPdf(); memoriserNumero(); }
+    if (MODE === 'devis') { document.title = nomPdf(); memoriserNumero(); agNoterDevis(); }
     document.querySelectorAll('.cli-fields input').forEach(inp => inp.classList.toggle('empty-field-print', !inp.value || !inp.value.trim()));
 });
 window.addEventListener('afterprint', () => {
@@ -2664,7 +3206,7 @@ window.addEventListener('load', () => {
       _type: 'dossier-compta', version: 1, annee,
       entreprise: { raisonSociale: '', forme: '', siret: '', tvaIntra: '', franchise: false, tvaDebits: false, pays: 'FR', tauxDefaut: 20 },
       regime: 'reel',
-      micro: { activite: 'mixte', periodicite: 'trimestrielle', versementLiberatoire: false },
+      micro: { activite: 'mixte', periodicite: 'trimestrielle', versementLiberatoire: false, acre: false, acreFin: '', acreTaux: '50' },
       dateCloture: annee + '-12-31',
       factures: [], encaissements: [], depenses: [],
       ventilations: {}, livraisons: {}, natures: {}, verifies: {}, relances: {}, relance: { delai: 0, ecart: 15 }, conflits: [], journal: [],
@@ -3636,6 +4178,7 @@ window.addEventListener('load', () => {
   }
 
   function rendre() {
+    if (global.majBtnTout) global.majBtnTout();
     const R = S.root; if (!R) return;
     S.vueConflit = enConflit();
     const avisHTML = S.avis.length ? `<div class="cpt-avis"><button class="cpt-x" data-action="fermer-avis" title="Fermer">×</button>${S.avis.map(a => `<div>${a}</div>`).join('')}</div>` : '';
@@ -3770,8 +4313,9 @@ window.addEventListener('load', () => {
       ? [{ lib: 'Encaissé HT', f: x => x.encHT }, { lib: 'Ventes', f: x => x.vente }, { lib: 'Prestations', f: x => r2(x.service + x.bnc) }, { lib: 'Dépenses TTC', f: x => x.depTTC }]
       : [{ lib: 'CA facturé HT', f: x => x.caHT }, { lib: 'Encaissé TTC', f: x => x.encTTC }, { lib: 'TVA collectée', f: x => x.tvaCol }, { lib: 'TVA déductible', f: x => x.tvaDed }, { lib: 'Dépenses TTC', f: x => x.depTTC }];
     if (D.entreprise.franchise && !micro) cols.splice(2, 2);
-    return `${encadreRelances(M)}
+    return `${global.agendaSemaineHTML ? global.agendaSemaineHTML() : ''}${encadreRelances(M)}
       <div class="cpt-tuiles">${tuiles.map(t => `<div class="cpt-tuile${t.att ? ' cpt-tuile-att' : ''}${t.pm ? (t.v >= 0 ? ' cpt-tuile-plus' : ' cpt-tuile-moins') : ''}${t.cls ? ' ' + t.cls : ''}"><span>${t.lib}</span><strong>${eur(t.v)}${t.u ? ` <em>${t.u}</em>` : ''}</strong>${t.sous.map(l => `<small class="${l[3] || ''}">${l[0]}${l[1] != null ? ` <b>${eur(l[1])}${l[2] ? ' ' + l[2] : ''}</b>` : ''}</small>`).join('')}</div>`).join('')}</div>
+      ${seuilFranchiseHTML(M)}
       <h3>Mon travail est-il payé, et qu'est-ce qu'il me reste ? <span class="cpt-gris">(par mois de facture)</span></h3>
       <div class="cpt-barres">${M.mois.map(barre).join('')}</div>
       <div class="cpt-legende"><span><i class="cpt-l-enc"></i>facturé et payé</span><span><i class="cpt-l-att"></i>facturé, pas encore payé</span><span><i class="cpt-l-dep"></i>dépenses</span><span><b class="cpt-res-plus">+ vert</b> / <b class="cpt-res-moins">− rouge</b> : ce qui reste du mois (facturé HT moins ${libDep})</span></div>
@@ -3911,6 +4455,7 @@ window.addEventListener('load', () => {
       ${manqueActif ? `<p class="cpt-manque-msg">⛔ ${esc(MQ.msg)} ${MQ.cles.length > 1 ? 'Les cases à corriger sont entourées en rouge.' : 'La case à corriger est entourée en rouge.'}</p>` : ''}
       <div class="cpt-ligne">
         <label class="cpt-btn cpt-sec">📷 ${e.photo ? 'Changer le justificatif' : 'Photo ou PDF du justificatif'}<input type="file" accept="image/*,application/pdf,.pdf" data-change="dep-photo" hidden></label>
+        <label class="cpt-btn cpt-sec cpt-tactile">📸 Prendre en photo<input type="file" accept="image/*" capture="environment" data-change="dep-photo" hidden></label>
         ${e.photo ? `<img class="cpt-mini" src="${e.photo}" data-action="voir-photo" data-src="ui" alt="aperçu"> <button class="cpt-lien" data-action="dep-sans-photo">retirer</button>` : ''}
         <button class="cpt-btn cpt-vertb" data-action="dep-valider">✔️ ${corr ? 'Enregistrer la correction' : 'Enregistrer la dépense'}</button>
       </div>
@@ -3963,6 +4508,48 @@ window.addEventListener('load', () => {
       ${al ? `<p class="cpt-note">Factures de vos sous-traitants en autoliquidation : la TVA est comptée à la fois en collectée et en déductible, le mois du paiement. Elle ne vous coûte rien, mais elle doit figurer sur votre déclaration : en « Autres opérations imposables » (montant hors taxe et TVA) et en déduction sur « Autres biens et services ».</p>` : ''}`;
   }
 
+  // ACRE : part du taux normal payée (50 % ou 75 %, selon l'attestation Urssaf), pour les périodes qui commencent avant la date de fin
+  function coefAcre(D, debutISO) {
+    const m = D.micro || {};
+    if (!m.acre || !/^\d{4}-\d{2}-\d{2}$/.test(m.acreFin || '')) return 1;
+    return debutISO <= m.acreFin ? (num(m.acreTaux) || 50) / 100 : 1;
+  }
+  const debutPeriode = (D, i, per) => `${D.annee}-${String(per === 12 ? i : (i - 1) * 3 + 1).padStart(2, '0')}-01`;
+
+  // Franchise de TVA : où en est l'entreprise par rapport aux seuils, et quand elle les atteindra au rythme actuel
+  function seuilFranchiseHTML(M) {
+    const D = S.dossier;
+    if (!D.entreprise.franchise) return '';
+    const P = params(D.annee).p.franchise, A = D.annee, j = auj(), courante = Number(j.slice(0, 4)) === A;
+    const jour1 = Date.UTC(A, 0, 1), nbJ = (Date.UTC(A + 1, 0, 1) - jour1) / 86400000;
+    const ecoules = courante ? Math.max(1, Math.round((jourUTC(j) - jour1) / 86400000) + 1) : nbJ;
+    const dateA = n => { const d = new Date(jour1 + (Math.ceil(n) - 1) * 86400000); return `${d.getUTCDate()} ${NOMS_MOIS[d.getUTCMonth()].toLowerCase()}`; };
+    const act = D.micro && D.micro.activite;
+    const lignes = [];
+    const tot = r2(M.an.encHT), serv = r2(M.an.service + M.an.bnc);
+    if (act !== 'service') lignes.push({ lib: 'Chiffre d\'affaires total', v: tot, b: P.vente, m: P.venteMajore });
+    if (act !== 'vente' || serv > 0) lignes.push({ lib: 'dont prestations de services', v: serv, b: P.service, m: P.serviceMajore });
+    if (!lignes.some(l => l.v > 0)) return '';
+    const parJour = l => l.v / ecoules;
+    const html = lignes.map(l => {
+      const pct = Math.min(100, Math.round(l.v / l.m * 100)), pb = Math.round(l.b / l.m * 100);
+      let msg;
+      if (l.v > l.m) msg = `<b class="cpt-rouge">Seuil majoré dépassé : la TVA est due depuis le jour du dépassement.</b> Vos factures doivent porter la TVA, et vous devez la déclarer.`;
+      else if (l.v > l.b) msg = `<b>Seuil dépassé, mais pas le seuil majoré</b> : pas de TVA cette année tant que vous restez sous ${eur(l.m)}. La TVA sera à facturer à partir du 1er janvier ${A + 1}.`
+        + (courante && parJour(l) > 0 && l.m / parJour(l) <= nbJ ? ` <b>Attention</b> : au rythme actuel, le seuil majoré serait atteint vers le ${dateA(l.m / parJour(l))}.` : '');
+      else if (!courante || parJour(l) <= 0) msg = `Sous le seuil de ${eur(l.b)}.`;
+      else {
+        const nb = l.b / parJour(l), nm = l.m / parJour(l), finAn = r2(parJour(l) * nbJ);
+        msg = nb > nbJ ? `Au rythme actuel (environ ${eur(r2(parJour(l) * 30.4))} par mois), vous finiriez l'année vers ${eur(finAn)} : <b>sous le seuil</b>.`
+          : `Au rythme actuel (environ ${eur(r2(parJour(l) * 30.4))} par mois), vous atteindriez le seuil vers le <b>${dateA(nb)}</b>` + (nm <= nbJ ? ` et le seuil majoré vers le <b>${dateA(nm)}</b>.` : ', sans dépasser le seuil majoré cette année.');
+      }
+      return `<div class="cpt-seuil"><div><b>${l.lib}</b> : ${eur(l.v)} encaissés sur ${eur(l.b)} (seuil) / ${eur(l.m)} (seuil majoré)</div>
+        <div class="cpt-jauge"><i style="left:${pct}%"></i><s style="left:${pb}%"></s></div><div>${msg}</div></div>`;
+    }).join('');
+    return `<div class="cpt-carte"><h3>🧮 Franchise de TVA : où en êtes-vous ?</h3>${html}
+      <p class="cpt-note">Estimation au rythme de vos encaissements depuis le 1er janvier, pas une prévision. Seuil dépassé : TVA à partir du 1er janvier suivant. Seuil majoré dépassé : TVA dès le jour du dépassement. Si vous avez dépassé le seuil l'an dernier, la franchise s'arrête déjà au 1er janvier.</p></div>`;
+  }
+
   function vueMicro(M) {
     const D = S.dossier, P = params(D.annee).p, vl = D.micro.versementLiberatoire;
     const per = D.micro.periodicite === 'mensuelle' ? 12 : 4;
@@ -3971,7 +4558,8 @@ window.addEventListener('load', () => {
       const ms = per === 12 ? [M.mois[i - 1]] : M.mois.slice((i - 1) * 3, i * 3);
       const s = { vente: 0, service: 0, bnc: 0 };
       ms.forEach(x => { s.vente = r2(s.vente + x.vente); s.service = r2(s.service + x.service); s.bnc = r2(s.bnc + x.bnc); });
-      const cot = r2(['vente', 'service', 'bnc'].reduce((t, k) => t + s[k] * (P.urssaf[k].taux + (vl ? P.urssaf[k].vl : 0)) / 100, 0));
+      const ca = coefAcre(D, debutPeriode(D, i, per));
+      const cot = r2(['vente', 'service', 'bnc'].reduce((t, k) => t + s[k] * (P.urssaf[k].taux * ca + (vl ? P.urssaf[k].vl : 0)) / 100, 0));
       ligPer.push(`<tr><td>${per === 12 ? NOMS_MOIS[i - 1] : ord(i) + ' trimestre'}</td><td class="cpt-n">${eur(s.vente)}</td><td class="cpt-n">${eur(s.service)}</td><td class="cpt-n">${eur(s.bnc)}</td><td class="cpt-n">${eur(cot)}</td></tr>`);
     }
     const recettes = M.enc.filter(k => k.dansAnnee);
@@ -3988,7 +4576,8 @@ window.addEventListener('load', () => {
     const achats = M.dep.filter(k => k.dansAnnee);
     return `<h3>Montants à déclarer à l'URSSAF (chiffre d'affaires encaissé HT)</h3>
       <table class="cpt-table"><thead><tr><th>Période</th><th class="cpt-n">${P.urssaf.vente.lib}</th><th class="cpt-n">${P.urssaf.service.lib}</th><th class="cpt-n">${P.urssaf.bnc.lib}</th><th class="cpt-n">Cotisations estimées${vl ? ' + versement libératoire' : ''}</th></tr></thead><tbody>${ligPer.join('')}</tbody></table>
-      <p class="cpt-note">Taux ${params(D.annee).annee} : ventes ${pctTxt(P.urssaf.vente.taux)}, prestations BIC ${pctTxt(P.urssaf.service.taux)}, BNC ${pctTxt(P.urssaf.bnc.taux)}${vl ? `, versement libératoire ${pctTxt(P.urssaf.vente.vl)} / ${pctTxt(P.urssaf.service.vl)} / ${pctTxt(P.urssaf.bnc.vl)}` : ''}. Estimation indicative (hors ACRE, hors CIPAV, hors taxes consulaires) : le montant exact est celui calculé par l'URSSAF.
+      ${D.micro.acre && D.micro.acreFin ? `<p class="cpt-note">ACRE : cotisations à ${esc(D.micro.acreTaux || '50')} % du taux normal pour les périodes qui commencent avant le ${dfr(D.micro.acreFin)} (versement libératoire non réduit).</p>` : ''}
+      <p class="cpt-note">Taux ${params(D.annee).annee} : ventes ${pctTxt(P.urssaf.vente.taux)}, prestations BIC ${pctTxt(P.urssaf.service.taux)}, BNC ${pctTxt(P.urssaf.bnc.taux)}${vl ? `, versement libératoire ${pctTxt(P.urssaf.vente.vl)} / ${pctTxt(P.urssaf.service.vl)} / ${pctTxt(P.urssaf.bnc.vl)}` : ''}. Estimation indicative (${D.micro.acre ? '' : 'hors ACRE, '}hors CIPAV, hors taxes consulaires) : le montant exact est celui calculé par l'URSSAF.
       ${D.micro.activite === 'mixte' ? '<br>Activité mixte : la part « ventes » vient des lignes « fourniture » de chaque facture. Les textes officiels ne fixent pas de méthode : ajustez le pourcentage dans « Ventes et encaissements » si besoin.' : ''}</p>
       <h3>Livre des recettes ${D.annee}</h3>
       ${recettes.length ? `<table class="cpt-table"><thead><tr><th>Date d'encaissement</th><th>Client</th><th>Pièce</th><th>Mode</th><th>Espèces</th><th class="cpt-n">Montant</th></tr></thead><tbody>${lr}</tbody></table>` : '<p class="cpt-gris">Aucun encaissement saisi.</p>'}
@@ -4014,7 +4603,7 @@ window.addEventListener('load', () => {
         <p class="cpt-note">Séparateur point-virgule et virgule décimale : s'ouvre directement dans Excel en double-cliquant.</p></div>
       <div class="cpt-carte"><h3>PDF (aucun logiciel à installer)</h3>
         <div class="cpt-ligne">${Object.keys(SECTIONS_PDF).filter(k => !(k === 'urssaf' && !micro) && !(k === 'tva' && D.entreprise.franchise)).map(k => `<button class="cpt-btn ${k === 'tout' ? '' : 'cpt-sec'}" data-action="recap" data-v="${k}">📄 ${SECTIONS_PDF[k]}</button>`).join('')}</div>
-        <p class="cpt-note">Dans la fenêtre d'impression, choisissez une imprimante PDF (par exemple « Microsoft Print to PDF » ou « Enregistrer au format PDF »), puis choisissez où ranger le fichier. Le nom du fichier est déjà copié : si la case Nom est vide, faites Ctrl+V.</p></div>
+        <p class="cpt-note">Dans la fenêtre d'impression, choisissez une imprimante PDF (par exemple « Microsoft Print to PDF » ou « Enregistrer au format PDF »), puis choisissez où ranger le fichier. Le nom du fichier est déjà copié : si la case Nom est vide, ${global.matchMedia && global.matchMedia('(pointer: coarse)').matches ? 'appuyez longuement dedans puis touchez « Coller »' : 'faites Ctrl+V'}.</p></div>
       <div class="cpt-carte"><h3>FEC pour le comptable</h3>
         ${reel ? `<button class="cpt-btn" data-action="fec">🗂️ Générer le FEC ${D.annee}</button>
         <p>Le FEC (fichier des écritures comptables) est le fichier à remettre à votre comptable. Donnez-le-lui tel quel, sans l'ouvrir ni le modifier.</p>
@@ -4049,7 +4638,11 @@ window.addEventListener('load', () => {
         <label>Votre activité <select data-change="p" data-k="micro.activite">${opt('mixte', 'Je fournis le matériel et la main-d\'œuvre', D.micro.activite)}${opt('service', 'Main-d\'œuvre uniquement (prestations)', D.micro.activite)}${opt('vente', 'Vente de marchandises uniquement', D.micro.activite)}${opt('bnc', 'Profession libérale', D.micro.activite)}</select></label>
         <label>Vous déclarez à l'URSSAF <select data-change="p" data-k="micro.periodicite">${opt('mensuelle', 'Tous les mois', D.micro.periodicite)}${opt('trimestrielle', 'Tous les trimestres', D.micro.periodicite)}</select></label>
         <label>Versement libératoire de l'impôt sur le revenu <select data-change="p" data-k="micro.versementLiberatoire">${ouiNon(D.micro.versementLiberatoire)}</select></label>
+        <label>ACRE (cotisations réduites au démarrage) <select data-change="p" data-k="micro.acre">${ouiNon(D.micro.acre)}</select></label>
+        ${D.micro.acre ? `<label>ACRE jusqu'au <input type="date" data-change="p" data-k="micro.acreFin" value="${esc(D.micro.acreFin || '')}"></label>
+        <label>Vous payez <select data-change="p" data-k="micro.acreTaux">${opt('50', '50 % du taux normal', String(D.micro.acreTaux || '50'))}${opt('75', '75 % du taux normal', String(D.micro.acreTaux || '50'))}</select></label>` : ''}
       </div>
+      ${D.micro.acre ? `<p class="cpt-note">ACRE : recopiez la date de fin et le taux de votre attestation Urssaf. L'aide dure jusqu'à la fin du 3e trimestre civil qui suit le début d'activité. Depuis le 1er juillet 2026, le taux réduit est passé de 50 % à 75 % du taux normal : choisissez celui qui figure sur votre attestation.</p>` : ''}
       <p class="cpt-note">Versement libératoire : laissez « Non » si vous ne savez pas, c'est une option qui se demande à l'URSSAF.</p>`
       : `<div class="cpt-grille"><label>Date de fin de votre exercice comptable <input type="date" data-change="p" data-k="dateCloture" value="${esc(D.dateCloture)}"></label></div>
       <p class="cpt-note">Le plus souvent le 31 décembre. Votre comptable connaît cette date.</p>`;
@@ -4090,7 +4683,8 @@ window.addEventListener('load', () => {
         const ms = per === 12 ? [M.mois[q - 1]] : M.mois.slice((q - 1) * 3, q * 3);
         const s = { vente: 0, service: 0, bnc: 0 };
         ms.forEach(x => { s.vente = r2(s.vente + x.vente); s.service = r2(s.service + x.service); s.bnc = r2(s.bnc + x.bnc); });
-        const cot = r2(['vente', 'service', 'bnc'].reduce((tt, k) => tt + s[k] * (P.urssaf[k].taux + (vl ? P.urssaf[k].vl : 0)) / 100, 0));
+        const ca = coefAcre(D, debutPeriode(D, q, per));
+        const cot = r2(['vente', 'service', 'bnc'].reduce((tt, k) => tt + s[k] * (P.urssaf[k].taux * ca + (vl ? P.urssaf[k].vl : 0)) / 100, 0));
         lr.push(`<tr><td>${per === 12 ? NOMS_MOIS[q - 1] : ord(q) + ' trimestre'}</td>${td(s.vente)}${td(s.service)}${td(s.bnc)}${td(cot)}</tr>`);
       }
       h += t('Chiffre d\'affaires encaissé HT à déclarer', ['Période', 'Ventes', 'Prestations BIC', 'BNC', 'Cotisations estimées'], lr);
@@ -4601,6 +5195,17 @@ window.addEventListener('load', () => {
       return true;
     },
     dossierOuvert() { return S.dossier ? S.dossier.annee : null; },
+    // Pour l'agenda : échéances à venir et relances (prévues ou à faire aujourd'hui) des factures non soldées
+    evenementsAgenda() {
+      if (!S.dossier) return [];
+      const M = calculer(), j = auj(), L = [];
+      (M.relances || []).forEach(x => {
+        if (x.ech >= j) L.push({ uid: 'echeance-' + x.num, type: 'echeance', titre: `Échéance ${x.num} : ${eur(x.reste)}`, debut: x.ech, client: x.client || '' });
+        const d = x.aFaire ? j : (x.prevue > x.ech ? x.prevue : plusJours(x.ech, 1));
+        if (d >= j) L.push({ uid: 'relance-' + x.num, type: 'relance', titre: `Relancer ${x.num} : ${eur(x.reste)}${x.retard > 0 ? ` (${x.retard} j de retard)` : ' si toujours impayée'}`, debut: d, client: x.client || '' });
+      });
+      return L;
+    },
     enregistrer() { if (!S.dossier) return false; action('sauver'); if (S.root) rendre(); return true; },
     // Dossier choisi depuis l'accueil, avec sa configuration
     ouvrirDossier(obj) {
