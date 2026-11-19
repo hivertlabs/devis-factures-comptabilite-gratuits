@@ -940,7 +940,7 @@ html:not(.sombre) .btn-theme { background: #e2e8f0; color: #003366; }
 
         <h3>Tarif dégressif (facultatif)</h3>
         <label class="check"><input type="checkbox" data-cfg="degressif.actif"> Je propose un tarif dégressif sur la main-d'œuvre</label>
-        <div class="hint">Plus le chantier compte d'heures de main-d'œuvre, plus la remise est forte. Elle est rétroactive : elle s'applique dès la 1ère heure, pas seulement aux heures au-delà du seuil.</div>
+        <div class="hint">Plus le chantier compte d'heures de main-d'œuvre, plus la remise est forte. Seules les lignes de main-d'œuvre comptées en heures (h) font monter le compteur. Elle est rétroactive : elle s'applique dès la 1ère heure, pas seulement aux heures au-delà du seuil.</div>
         <div class="box-soft" data-show="degressif">
             <div class="list-head pal-grid"><span>À partir de (heures)</span><span>Remise (%)</span><span></span></div>
             <div id="paliersBox"></div>
@@ -1121,11 +1121,11 @@ html:not(.sombre) .btn-theme { background: #e2e8f0; color: #003366; }
         </div>
     </div>
     <div data-showdev="deductions">
-        <h3>Acomptes déjà facturés à déduire</h3>
-        <div class="hint" style="margin-bottom:8px;">Si vous avez déjà facturé un acompte au client, déduisez-le ici : la facture affichera le total, l'acompte déduit et le net à payer. Le plus sûr est de charger le fichier de la facture d'acompte : son numéro, sa date et son montant sont repris tout seuls.</div>
+        <h3 id="hDed">Acomptes déjà facturés à déduire</h3>
+        <div class="hint" style="margin-bottom:8px;" id="hintDed">Si vous avez déjà facturé un acompte au client, déduisez-le ici : la facture affichera le total, l'acompte déduit et le net à payer. Le plus sûr est de charger le fichier de la facture d'acompte : son numéro, sa date et son montant sont repris tout seuls.</div>
         <div id="deductionsBox"></div>
-        <button class="btn btn-blue btn-small" onclick="document.getElementById('fileAcompte').click()">📂 Déduire une facture d'acompte (son fichier .json)</button>
-        <button class="btn btn-light btn-small" onclick="ajouterDeduction()">+ Saisir un acompte à la main</button>
+        <button class="btn btn-blue btn-small" data-showdev="dedfac" onclick="document.getElementById('fileAcompte').click()">📂 Déduire une facture d'acompte (son fichier .json)</button>
+        <button class="btn btn-light btn-small" data-showdev="dedfac" onclick="ajouterDeduction()">+ Saisir un acompte à la main</button>
     </div>
     <div class="field-group" style="margin-top:8px;" data-showdev="devis"><label>Conditions d'exécution</label><textarea rows="2" data-dev="limites"></textarea></div>
     <div class="field-group" style="margin-top:8px;"><label>Note pour ce document</label><textarea rows="2" data-dev="note" placeholder="Facultatif"></textarea></div>
@@ -1307,7 +1307,7 @@ const PAYS = {
         docs: {}
     },
     CH: {
-        nom: 'Suisse', drapeau: '🇨🇭', locale: 'de-CH', devise: 'CHF', lbl: { ht: 'HT', ttc: 'TTC', taxe: 'TVA' },
+        nom: 'Suisse', drapeau: '🇨🇭', locale: 'fr-CH', devise: 'CHF', lbl: { ht: 'HT', ttc: 'TTC', taxe: 'TVA' },
         taux: [
             { t: 8.1, lib: '8,1 %', aide: 'taux normal' },
             { t: 2.6, lib: '2,6 %', aide: 'taux réduit (denrées alimentaires, livres, médicaments...)' },
@@ -1555,11 +1555,14 @@ function initiales(cfg) {
 }
 function tvaParDefaut() { const d = num(CFG.tva.defaut); return CFG.tva.taux.includes(d) ? d : P().defaut; }
 function estFacture(dv) { return !!dv.docType && dv.docType !== 'devis'; }
-function deductionsDe(dv) { return dv.docType === 'facture' ? (dv.deductions || []).filter(d => num(d.montant) !== 0) : []; }
+// Facture de solde : acomptes déduits. Avoir : acomptes repris (montant négatif) pour annuler exactement le net de la facture d'origine.
+function deductionsDe(dv) { return (dv.docType === 'facture' || dv.docType === 'avoir') ?(dv.deductions || []).filter(d => num(d.montant) !== 0) : []; }
 function netAPayer(dv, c) { return r2(c.ttc - deductionsDe(dv).reduce((s, d) => s + num(d.montant), 0)); }
 // Réglages figés d'un document émis (ou d'un avoir tiré d'une facture émise) : si la configuration change ensuite
 // (sortie de la franchise, remise dégressive modifiée), la réimpression et l'avoir gardent les montants d'origine.
 function figeDe(dv) { const f = dv && (dv.fige || (dv.emise ? dv.totaux : null)); return f && typeof f.franchise === 'boolean' ? f : null; }
+// Documents émis avant l'arrondi des prix au centime (montants figés en version 2 ou avant) : prix gardés tels quels
+function prixBruts(dv) { const f = figeDe(dv); return !!f && !(num(f.v) >= 3); }
 function cfgDe(dv) {
     const f = figeDe(dv);
     if (!f || f.franchise === !!CFG.legal.franchise) return CFG;
@@ -1577,8 +1580,10 @@ function remiseDegressive(cfg, dv, heuresMO) {
 
 function calc(cfg, dv) {
     const noTva = sansTVA(cfg, dv);
-    const lignesMO = dv.lignes.filter(l => l.type === 'mo');
-    const heuresMO = lignesMO.reduce((s, l) => s + num(l.qty), 0);
+    // Dégressif : seules les lignes de main-d'œuvre en heures comptent (pas les m², pièces ou forfaits)
+    const heuresMO = dv.lignes.filter(l => l.type === 'mo' && l.unite === 'h').reduce((s, l) => s + num(l.qty), 0);
+    // Prix au centime, jamais 3 décimales (sauf documents émis avant cette règle : ils gardent leurs montants figés)
+    const prix = l => (prixBruts(dv) ? num(l.pu) : r2(num(l.pu)));
     const rDeg = remiseDegressive(cfg, dv, heuresMO);
 
     const out = dv.lignes.map(l => ({ l, qty: 0, pu: 0, total: 0, tva: 0 }));
@@ -1586,7 +1591,7 @@ function calc(cfg, dv) {
     out.forEach(o => {
         if (o.l.type !== 'mo') return;
         o.qty = num(o.l.qty);
-        o.pu = r2(num(o.l.pu) * (1 - rDeg / 100));
+        o.pu = r2(prix(o.l) * (1 - rDeg / 100));
         o.total = r2(o.qty * o.pu);
         totalMO += o.total;
     });
@@ -1597,7 +1602,7 @@ function calc(cfg, dv) {
         if (l.type === 'supplement' && l.mode === 'pct') {
             o.total = r2(totalMO * num(l.pct) / 100); o.pu = o.total; o.qty = 1;
         } else {
-            o.qty = num(l.qty); o.pu = num(l.pu); o.total = r2(o.qty * o.pu);
+            o.qty = num(l.qty); o.pu = prix(l); o.total = r2(o.qty * o.pu);
         }
     });
     out.forEach(o => { o.tva = (o.l.type === 'titre' || noTva) ? 0 : num(o.l.tva); });
@@ -1729,8 +1734,11 @@ function htmlTotals(cfg, dv, c) {
     h += `<div class="t-row t-final"><span>${labelFinal}</span><span>${fE(c.ttc)}</span></div>`;
     if (!fac && c.acompte > 0) h += row(`Acompte à la commande (${fN(c.acPct)} %)`, fE(c.acompte), 't-acompte');
     if (ded.length) {
-        ded.forEach(d => { h += row(esc(d.lib || 'Acompte déjà facturé'), '- ' + fE(num(d.montant)), 't-ded'); });
-        h += row('NET À PAYER', fE(netAPayer(dv, c)), 't-net');
+        ded.forEach(d => {
+            const m = num(d.montant), det = d.ht != null && num(d.tva) ? ` <span class="d-small">(${fE(Math.abs(num(d.ht)))}${HT} + ${fE(Math.abs(num(d.tva)))} ${Lb.taxe})</span>` : '';
+            h += row(esc(d.lib || 'Acompte déjà facturé') + det, (m < 0 ? '+ ' : '- ') + fE(Math.abs(m)), 't-ded');
+        });
+        h += row(t === 'avoir' ? (P().docs.avoir ? 'NET DE LA NOTE DE CRÉDIT' : "NET DE L'AVOIR") : 'NET À PAYER', fE(netAPayer(dv, c)), 't-net');
     }
     return h;
 }
@@ -1997,9 +2005,10 @@ function initEditeur() {
         renderDoc(); sauverPlusTard();
     });
     box.addEventListener('change', e => {
-        const k = e.target.dataset.l; if (k !== 'type' && k !== 'mode' && k !== 'tva' && k !== 'unite') return;
+        const k = e.target.dataset.l; if (k !== 'type' && k !== 'mode' && k !== 'tva' && k !== 'unite' && k !== 'pu') return;
         const i = parseInt(e.target.closest('[data-i]').dataset.i, 10);
         const l = DEV.lignes[i]; if (!l) return;
+        if (k === 'pu') { if (!prixBruts(DEV)) { l.pu = r2(num(e.target.value)); e.target.value = l.pu; } renderDoc(); sauverPlusTard(); return; } // prix arrondi au centime en quittant la case
         if (k === 'unite') { l.unite = e.target.value === '__autre' ? demanderUnite(l.unite) : e.target.value; renderEditeur(); renderDoc(); sauverPlusTard(); return; }
         if (k === 'tva') { l.tva = num(e.target.value); renderDoc(); sauverPlusTard(); return; }
         l[k] = e.target.value;
@@ -2090,7 +2099,7 @@ function versFacture(type) {
     const src = JSON.parse(JSON.stringify(DEV)), c = calc(CFG, src);
     const f = merge(defaultDevis(), src);
     Object.assign(f, { docType: type, devisRef: src.numero || '', devisDate: src.date || '', date: todayISO(), emise: false, acompte: 0, limites: '', deductions: [] });
-    f.echeance = addDays(f.date, Math.max(0, num(CFG.conditions.delaiJours)));
+    f.echeance = addDays(f.date, Math.max(0, num(CFG.conditions.delaiJours))); f.echeanceAuto = true;
     f.natureOp = natureAuto(src);
     if (type === 'acompte') {
         const pct = num(src.acompte) > 0 ? num(src.acompte) : 30;
@@ -2110,13 +2119,14 @@ function totauxDe(doc) {
     if (doc.totaux && typeof doc.totaux.ttc === 'number') return doc.totaux;
     const K = cfgDe(doc), c = calc(K, doc);
     return {
-        v: 2, ht: c.netHT, tva: c.totalTVA, ttc: c.ttc, net: netAPayer(doc, c), franchise: !!K.legal.franchise, rDeg: c.rDeg,
+        v: 3, ht: c.netHT, tva: c.totalTVA, ttc: c.ttc, net: netAPayer(doc, c), franchise: !!K.legal.franchise, rDeg: c.rDeg,
         pays: CFG.pays || 'FR', devise: P().devise, sansTaxe: c.noTva,
         detail: c.detail.map(d => Object.assign({ taux: d.taux, base: d.base, tva: d.tva }, d.parts ? { parts: d.parts } : {}))
     };
 }
 function deductionDepuis(doc) {
-    return { lib: `Acompte facturé (facture n° ${doc.numero} du ${fD(doc.date)})`, montant: totauxDe(doc).ttc, ref: doc.numero };
+    const t = totauxDe(doc);
+    return { lib: `Acompte facturé (facture n° ${doc.numero} du ${fD(doc.date)})`, montant: t.ttc, ref: doc.numero, ht: t.ht, tva: t.tva };
 }
 // À partir d'une facture d'acompte émise : la facture de solde, avec l'acompte déduit tout seul
 function versSolde() {
@@ -2130,7 +2140,7 @@ function versSolde() {
         clientType: ac.clientType, clientNom: ac.clientNom, clientAdresse: ac.clientAdresse, clientContact: ac.clientContact,
         clientSiren: ac.clientSiren, clientTva: ac.clientTva, autoliquidation: ac.autoliquidation
     });
-    f.echeance = addDays(f.date, Math.max(0, num(CFG.conditions.delaiJours)));
+    f.echeance = addDays(f.date, Math.max(0, num(CFG.conditions.delaiJours))); f.echeanceAuto = true;
     DEV = f;
     suggererNumeroFacture();
     rafraichirSaisie();
@@ -2181,12 +2191,14 @@ function renderSuite() {
 
 function creerAvoir() {
     if (!estFacture(DEV) || DEV.docType === 'avoir' || !DEV.emise) return;
-    if (!confirm(`Créer un avoir sur la facture ${DEV.numero} ?\n\nL'avoir reprend toutes les lignes en négatif. Pour un avoir partiel, supprimez ou modifiez les lignes avant de l'émettre.`)) return;
+    const dedSrc = deductionsDe(DEV), netSrc = totauxDe(DEV).net;
+    if (!confirm(`Créer un avoir sur la facture ${DEV.numero} ?\n\nL'avoir reprend toutes les lignes en négatif.` + (dedSrc.length ? ` Les acomptes déduits sur cette facture sont repris : l'avoir annule exactement son net à payer (${fE(netSrc)}).` : '') + ` Pour un avoir partiel, supprimez ou modifiez les lignes avant de l'émettre.`)) return;
     const src = JSON.parse(JSON.stringify(DEV));
     const f = merge(defaultDevis(), src);
-    Object.assign(f, { docType: 'avoir', devisRef: src.numero, devisDate: src.date, date: todayISO(), emise: false, echeance: '', deductions: [], note: '' });
+    Object.assign(f, { docType: 'avoir', devisRef: src.numero, devisDate: src.date, date: todayISO(), emise: false, echeance: '', note: '', netOrigine: netSrc,
+        deductions: dedSrc.map(d => Object.assign({}, d, { lib: (d.lib || 'Acompte') + ", déjà déduit de la facture d'origine", montant: -num(d.montant) })) });
     delete f.emiseLe; delete f.devisSource; delete f.totaux; delete f.acomptePrevu;
-    const fs = figeDe(src); if (fs) f.fige = { franchise: fs.franchise, rDeg: fs.rDeg };
+    const fs = figeDe(src); if (fs) f.fige = { franchise: fs.franchise, rDeg: fs.rDeg, v: fs.v };
     f.lignes.forEach(l => { if (l.type !== 'titre' && !(l.type === 'supplement' && l.mode === 'pct')) l.pu = -num(l.pu); });
     DEV = f;
     suggererNumeroFacture();
@@ -2232,8 +2244,11 @@ function majVisibiliteDevis() {
         degressif: CFG.degressif.actif && t !== 'acompte',
         autoliq: DEV.clientType === 'pro' && !CFG.legal.franchise && !!p.autoliq,
         devis: !fac, facture: fac, facpro: fac && DEV.clientType === 'pro', facprofr: fac && DEV.clientType === 'pro' && !!p.france, naturefr: !!p.france,
-        prestation: t === 'facture', echeance: fac && t !== 'avoir', deductions: t === 'facture'
+        prestation: t === 'facture', echeance: fac && t !== 'avoir', deductions: t === 'facture' || (t === 'avoir' && (DEV.deductions || []).length > 0), dedfac: t === 'facture'
     };
+    const hd = $('hintDed'); if (!hd.dataset.fac) hd.dataset.fac = hd.textContent;
+    $('hDed').textContent = t === 'avoir' ? "Acomptes repris de la facture d'origine" : 'Acomptes déjà facturés à déduire';
+    hd.textContent = t === 'avoir' ? "La facture d'origine déduisait ces acomptes : ils sont repris pour que l'avoir annule exactement ce qu'elle demandait au client. Avoir partiel (une partie des lignes seulement) : supprimez cette ligne." : hd.dataset.fac;
     document.querySelectorAll('#screenDevis [data-showdev]').forEach(el => el.classList.toggle('hidden', !etats[el.dataset.showdev]));
     const Nom = D.nom.charAt(0).toUpperCase() + D.nom.slice(1);
     $('hDoc').textContent = (fac ? '🧾 ' : '📝 ') + Nom;
@@ -2263,6 +2278,12 @@ function initDevisForm() {
         const h = () => {
             const k = el.dataset.dev;
             DEV[k] = el.type === 'checkbox' ? el.checked : (el.dataset.kind === 'num' ? num(el.value) : el.value);
+            // Facture : l'échéance calculée automatiquement suit la date de la facture, tant qu'on ne l'a pas changée à la main
+            if (k === 'echeance') DEV.echeanceAuto = false;
+            if (k === 'date' && DEV.echeanceAuto && estFacture(DEV) && DEV.docType !== 'avoir' && !DEV.emise && agIso(DEV.date)) {
+                DEV.echeance = addDays(DEV.date, Math.max(0, num(CFG.conditions.delaiJours)));
+                const ec = document.querySelector('[data-dev="echeance"]'); if (ec) ec.value = DEV.echeance;
+            }
             if (k === 'clientType' || k === 'autoliquidation' || k === 'demo') { if (k === 'clientType' && DEV.clientType !== 'pro') DEV.autoliquidation = false; majVisibiliteDevis(); renderEditeur(); }
             renderDoc(); sauverPlusTard();
         };
@@ -2298,6 +2319,15 @@ function alertesDevis(c) {
         if (p.france && t !== 'avoir' && !DEV.echeance) a.push("L'échéance de paiement est une mention obligatoire.");
         if (!p.iban && t !== 'avoir' && !CFG.conditions.iban && /virement/i.test(CFG.conditions.moyens || '')) a.push('Vous acceptez les virements mais votre IBAN n\'est pas renseigné (« Modifier ma configuration », étape Conditions).');
         if (t === 'facture' && netAPayer(DEV, c) < 0) a.push('Les acomptes déduits dépassent le total de la facture.');
+        if (t === 'avoir') {
+            const net = netAPayer(DEV, c);
+            if (net > 0.005) a.push("L'avoir ressort en positif. Pour un avoir partiel, supprimez l'acompte repris (cadre « Acomptes repris de la facture d'origine »).");
+            if (typeof DEV.netOrigine === 'number' && Math.abs(net) > Math.abs(DEV.netOrigine) + 0.005) a.push(`L'avoir (${fE(Math.abs(net))}) dépasse le montant de la facture d'origine (${fE(Math.abs(DEV.netOrigine))}).`);
+        }
+        if (t === 'facture' && String(DEV.datePrestation || '').trim() && !/\d{1,2}[\/.]\d{1,2}|\d{4}-\d{2}-\d{2}/.test(DEV.datePrestation)) a.push(`La date de la prestation doit être une vraie date (par exemple 12/12/2026, ou du 07/12 au 18/12/2026), pas « ${DEV.datePrestation} ».`);
+        if (t !== 'avoir' && DEV.echeance && DEV.date && DEV.echeance < DEV.date) a.push("L'échéance de paiement est avant la date de la facture.");
+        if (!DEV.emise && DEV.date && DEV.date > todayISO()) a.push(`La date de ${D.un} est dans le futur.`);
+        { const sq = seqNumero(DEV.numero); if (sq && DEV.date && sq.annee !== +DEV.date.slice(0, 4)) a.push(`L'année du numéro (${sq.annee}) n'est pas celle de la date (${DEV.date.slice(0, 4)}) : cliquez sur « +1 » à côté du numéro.`); }
         if (t === 'facture' && DEV.acomptePrevu && !deductionsDe(DEV).length) a.push(`Le devis prévoyait un acompte de ${fN(DEV.acomptePrevu.pct)} % (${fE(DEV.acomptePrevu.montant)}). Si vous l'avez facturé, déduisez-le avec le bouton « Déduire une facture d'acompte », plus haut.`);
     }
     return a;
@@ -2646,6 +2676,7 @@ function brancherListe(boxId, getListe, numKeys, rerender) {
             item.unite = demanderUnite(item.unite); rerender(); onCfg(); return;
         }
         item[k] = numKeys.includes(k) ? num(e.target.value) : e.target.value;
+        if (k === 'pu' && e.type === 'change') { item[k] = r2(item[k]); e.target.value = item[k]; } // prix au centime
         onCfg();
     };
     box.addEventListener('input', maj);
@@ -2692,6 +2723,9 @@ function initConfigForm() {
     $('inDernFac').addEventListener('change', e => {
         const an = new Date().getFullYear(), n = Math.max(0, Math.floor(num(e.target.value))), connu = dernierFacture(an);
         if (n < connu && !confirm(`La facture n° ${pad3(connu)} a déjà été émise en ${an}. Revenir à ${pad3(n)} ferait réutiliser des numéros déjà émis, ce qui est interdit.\n\nNe confirmez que pour corriger une erreur de saisie de ce compteur. Confirmer ?`)) { e.target.value = connu; return; }
+        // Reprise d'un autre logiciel (aucune facture émise ici cette année) : les numéros d'avant ne sont pas « manquants » en compta
+        const rp = CFG.numerotation.reprise;
+        if (connu === 0 || (rp && rp.annee === an && rp.n === connu)) { if (n > 0) CFG.numerotation.reprise = { annee: an, n }; else delete CFG.numerotation.reprise; }
         lsSet(LS_NUMF, { annee: an, n }); CFG.numerotation.factures = { annee: an, n };
         onCfg();
     });
@@ -3074,7 +3108,9 @@ function agNoterDevis() {
     // On ne garde pas les devis expirés depuis plus de 60 jours
     const vieux = addDays(todayISO(), -60);
     Object.keys(a.devis).forEach(k => { if (!agIso(a.devis[k].fin) || a.devis[k].fin < vieux) delete a.devis[k]; });
-    agModifie();
+    // Simple rappel : rangé dans la configuration au prochain enregistrement, sans bannière ni alerte à la fermeture
+    // (elles restent réservées au compteur de factures et aux rendez-vous saisis, pour qu'on ne prenne pas l'habitude de les ignorer)
+    sauverPlusTard();
 }
 // Bouton « Mettre à l'agenda » du devis : reprend le client, le lieu, l'objet et les dates écrites dans « Date prévue des travaux »
 function agendaDepuisDevis() {
@@ -3527,12 +3563,15 @@ window.addEventListener('load', () => {
       return `${fichier} : ATTENTION, un autre fichier porte déjà le numéro ${esc(obj.numero)}. Le premier est conservé, le doublon est signalé dans Contrôles.`;
     }
     D.factures.push(obj);
-    D.factures.sort((a, b) => (a.numero < b.numero ? -1 : 1));
+    D.factures.sort(triNumeros);
     noter('import', obj.numero);
     let m = `${fichier} : ${TYPES_DOC[t].toLowerCase()} ${esc(obj.numero)} importée.`;
     if (anneeDe(obj.date) !== D.annee) m += ` (datée de ${anneeDe(obj.date)}, hors année du dossier : comptée seulement pour ses encaissements de ${D.annee})`;
     return m;
   }
+
+  // F-2026-999 avant F-2026-1000 (comparaison des nombres, pas des lettres)
+  const triNumeros = (a, b) => String(a.numero || '').localeCompare(String(b.numero || ''), 'fr', { numeric: true });
 
   function lireFichiers(files, cb) {
     const liste = Array.from(files || []);
@@ -3614,9 +3653,9 @@ window.addEventListener('load', () => {
     (doc.deductions || []).forEach(dd => {
       const ac = dd.ref && idx[dd.ref];
       if (ac && ac.docType === 'acompte') {
-        const ca = detailDoc(ac).c;
-        if (Math.abs(ca.ttc - num(dd.montant)) > 0.011) msgs.push(`Acompte ${dd.ref} déduit pour ${eur(dd.montant)} mais sa facture fait ${eur(ca.ttc)} TTC : À VÉRIFIER.`);
-        c = combiner(c, ca, -1);
+        const ca = detailDoc(ac).c, sens = num(dd.montant) < 0 ? 1 : -1;  // montant négatif : acompte repris par un avoir
+        if (Math.abs(ca.ttc - Math.abs(num(dd.montant))) > 0.011) msgs.push(`Acompte ${dd.ref} déduit pour ${eur(Math.abs(num(dd.montant)))} mais sa facture fait ${eur(ca.ttc)} TTC : À VÉRIFIER.`);
+        c = combiner(c, ca, sens);
       } else {
         msgs.push(`Acompte ${dd.ref || '(sans numéro)'} non importé : déduction répartie au prorata des taux. Importez la facture d'acompte pour un calcul exact.`);
         const f = c.ttc ? num(dd.montant) / c.ttc : 0;
@@ -3657,11 +3696,27 @@ window.addEventListener('load', () => {
     const act = D.micro.activite;
     if (act === 'vente') return { r: 1 };
     if (act !== 'mixte') return { r: 0 };
-    let lignes = doc.lignes || [];
-    if (doc.docType === 'acompte' && doc.devisSource && Array.isArray(doc.devisSource.lignes)) lignes = doc.devisSource.lignes;
-    let v = 0, t = 0;
-    lignes.forEach(l => { if (l.type === 'titre') return; const m = num(l.qty) * num(l.pu); t += m; if (l.type === 'fourniture') v += m; });
+    let lignes = doc.lignes || [], src = doc;
+    if (doc.docType === 'acompte' && doc.devisSource && Array.isArray(doc.devisSource.lignes)) { src = doc.devisSource; lignes = src.lignes; }
+    // Mêmes montants que sur le document : main-d'œuvre après dégressif, majorations en % calculées sur la main-d'œuvre
+    const rd = rDegDe(src, lignes, src !== doc);
+    let v = 0, t = 0, mo = 0;
+    lignes.forEach(l => { if (l.type === 'mo') mo += num(l.qty) * num(l.pu) * (1 - rd / 100); });
+    lignes.forEach(l => {
+      if (l.type === 'titre') return;
+      const m = l.type === 'mo' ? num(l.qty) * num(l.pu) * (1 - rd / 100) : l.type === 'supplement' && l.mode === 'pct' ? mo * num(l.pct) / 100 : num(l.qty) * num(l.pu);
+      t += m; if (l.type === 'fourniture') v += m;
+    });
     return { r: t ? v / t : 0 };
+  }
+  // Remise dégressive d'un document : figée à l'émission ; pour le devis voyageant dans une facture d'acompte, recalculée avec la configuration
+  function rDegDe(doc, lignes, estDevis) {
+    if (!estDevis && doc.totaux && typeof doc.totaux.rDeg === 'number') return doc.totaux.rDeg;
+    const dg = S.config && S.config.degressif;
+    if (!estDevis || !dg || !dg.actif || doc.appliquerDegressif === false || !Array.isArray(dg.paliers)) return 0;
+    const h = lignes.filter(l => l.type === 'mo' && l.unite === 'h').reduce((s, l) => s + num(l.qty), 0);
+    const p = dg.paliers.filter(x => num(x.seuil) > 0 && h >= num(x.seuil)).sort((a, b) => num(b.seuil) - num(a.seuil))[0];
+    return p ? Math.min(Math.max(num(p.remise), 0), 100) : 0;
   }
 
   function ecrituresActives(liste) { return liste.filter(x => !x.annuleLe); }
@@ -3841,11 +3896,14 @@ window.addEventListener('load', () => {
       if (D.reportDe && parseInt(k.split('-').pop(), 10) < A) return;
       const ns = groupes[k].sort((a, b) => a - b);
       const max = ns[ns.length - 1];
+      // Numérotation reprise d'un autre logiciel (dernier n° saisi dans la configuration) : la série commence après lui
+      const nu = (S.config && S.config.numerotation) || {}, rp = nu.reprise;
+      const debut = rp && k === `${nu.prefixeFacture || 'F'}-${rp.annee}` && num(rp.n) > 0 ? num(rp.n) + 1 : 1;
       const manquants = [];
-      for (let i = 1; i <= max; i++) if (ns.indexOf(i) < 0) manquants.push(i);
+      for (let i = debut; i <= max; i++) if (ns.indexOf(i) < 0) manquants.push(i);
       const largeur = String(max).length < 3 ? 3 : String(max).length;
-      M.numeros.push({ serie: k, n: ns.length, max, manquants: manquants.map(i => `${k}-${String(i).padStart(largeur, '0')}`) });
-      if (manquants.length) al.push({ niv: 'alerte', txt: `Série ${k} : ${manquants.length} numéro(s) manquant(s) entre 1 et ${max}. Importez les fichiers manquants (y compris les avoirs).` });
+      M.numeros.push({ serie: k, n: ns.length, max, debut, manquants: manquants.map(i => `${k}-${String(i).padStart(largeur, '0')}`) });
+      if (manquants.length) al.push({ niv: 'alerte', txt: `Série ${k} : ${manquants.length} numéro(s) manquant(s) entre ${debut} et ${max}. Importez les fichiers manquants (y compris les avoirs).` });
     });
     D.conflits.forEach(c => al.push({ niv: 'alerte', txt: `Doublon : le fichier ${c.fichier} porte le numéro ${c.numero} déjà utilisé par une autre facture.` }));
     M.docs.forEach(r => r.msgs.forEach(t => al.push({ niv: /VÉRIFIER/.test(t) ? 'alerte' : 'info', txt: `${r.num} : ${t}` })));
@@ -4284,12 +4342,18 @@ window.addEventListener('load', () => {
   ];
   // Nom d'enseigne trouvé n'importe où dans le texte (logo en image = nom absent de l'en-tête)
   const MOTS_GENERIQUES = /^(PARKING|AUTOROUTE|HOTEL|RESTAURANT|BRASSERIE|BISTR|PIZZ|SNACK|KEBAB|BOULANGERIE|TRAITEUR|CAFETERIA|ROUTIER|STATION[- ]SERVICE|OUTILLAGE|PAPETERIE|ASSURANCE|TAXI|LOCATION)/;
-  function marqueDans(texte) {
-    const T = SANS_ACCENT(texte);
+  // Mots qui désignent souvent autre chose qu'un fournisseur dans le corps d'un ticket : BP (boîte postale),
+  // ORANGE (jus d'orange), FREE, AREA, ENI, et les marques d'outils vendues en magasin (BOSCH, MAKITA...).
+  const AMBIGUS = /^(BP|ORANGE|FREE|AREA|ENI|ASF|BOSCH|MAKITA|DEWALT|MILWAUKEE|FESTOOL|FACOM|AVIA)$/;
+  // Cherché seulement en haut du ticket (là où est l'enseigne) : 4 lignes si un nom a déjà été lu, 10 sinon.
+  function marqueDans(texte, nbLignes) {
+    const T = SANS_ACCENT(String(texte || '').split(/\r?\n/).slice(0, nbLignes || 10).join('\n'));
     for (const [c, re] of REGLES_FOURNISSEUR) {
       if (c === 'assurance') continue;  // les assureurs figurent dans les mentions légales de presque toutes les factures
-      const m = new RegExp(re.source).exec(T);
-      if (m && !MOTS_GENERIQUES.test(m[0])) return m[0].trim();
+      for (const m of T.matchAll(new RegExp(re.source, 'g'))) {
+        const mot = m[0].trim();
+        if (!MOTS_GENERIQUES.test(mot) && !AMBIGUS.test(mot)) return mot;
+      }
     }
     return '';
   }
@@ -4341,7 +4405,7 @@ window.addEventListener('load', () => {
     if (c.numero && e.ref && e.ref !== c.numero) ecarts.push(`N° de facture : vous avez saisi ${e.ref}, le justificatif indique ${c.numero}.`);
     if (meta.texte) {
       const connu = c.fournisseur && REGLES_FOURNISSEUR.some(([, re]) => re.test(SANS_ACCENT(c.fournisseur)));
-      const marque = connu ? '' : marqueDans(meta.texte);
+      const marque = connu ? '' : marqueDans(meta.texte, c.fournisseur ? 4 : 10);
       if (marque) c.fournisseur = marque;
     }
     if (c.date && (!e.date || e.date === auj() || e.date === e.dateReprise)) { e.date = c.date; remplis.push('date'); }
@@ -4483,6 +4547,7 @@ window.addEventListener('load', () => {
     const cout = x => r2(x.depTTC - (x.tvaDed - x.autoliq) - (sansImmo ? x.immo : 0));  // la TVA autoliquidée ne réduit pas le coût
     const max = Math.max(1, ...M.mois.map(x => Math.max(x.caHT, cout(x))));
     const resAn = r2(M.mois.reduce((s, x) => s + x.caHT - cout(x), 0));
+    const resEncAn = r2(M.mois.reduce((s, x) => s + x.encHT - cout(x), 0));  // micro : encaissé (pas facturé) moins dépenses
     const franchise = D.entreprise.franchise, libDep = franchise ? 'dépenses' : 'dépenses HT';
     const tvaNette = r2(a.tvaCol - a.tvaDed);
     /* Chaque case : le chiffre qui compte en gros, et en dessous le calcul qui y mène (HT, TVA, TTC),
@@ -4493,7 +4558,7 @@ window.addEventListener('load', () => {
     const tuiles = micro
       ? [{ lib: 'Encaissé', v: a.encHT, u: 'HT', sous: [['dont ventes', a.vente], ['dont prestations', r2(a.service + a.bnc)], ligneReste], att: reste > 0.009 },
          { lib: 'Dépenses', v: a.depTTC, u: 'TTC', sous: [] },
-         { lib: `Encaissé moins ${libDep}`, v: resAn, pm: true, sous: [] }]
+         { lib: `Encaissé moins ${libDep}`, v: resEncAn, pm: true, sous: [] }]
       : [{ lib: 'Facturé', v: a.caHT, u: 'HT', sous: franchise ? [['sans TVA (franchise)', null, '']] : [['+ TVA', tvaFact], ['= TTC', r2(a.caHT + tvaFact)]] },
          { lib: 'Encaissé (sur le compte)', v: a.encTTC, u: 'TTC', sous: (franchise ? [] : [['dont TVA', r2(a.encTTC - a.encHT)], ['soit HT', a.encHT]]).concat([ligneReste]), att: reste > 0.009 },
          { lib: 'Dépenses', v: a.depTTC, u: 'TTC', sous: franchise ? [['pas de TVA récupérable', null, '']] : [['TVA récupérable', r2(a.tvaDed - a.autoliq)], ['soit HT', r2(a.depTTC - a.tvaDed + a.autoliq)]] }]
@@ -4799,7 +4864,7 @@ window.addEventListener('load', () => {
     const D = S.dossier;
     const al = M.alertes.filter(a => a.niv === 'alerte'), inf = M.alertes.filter(a => a.niv === 'info');
     return `<h3>Numérotation des factures</h3>
-      ${M.numeros.length ? `<table class="cpt-table"><thead><tr><th>Série</th><th class="cpt-n">Documents</th><th class="cpt-n">Dernier n°</th><th>Manquants</th></tr></thead><tbody>${M.numeros.map(n => `<tr><td>${esc(n.serie)}</td><td class="cpt-n">${n.n}</td><td class="cpt-n">${n.max}</td><td>${n.manquants.length ? `<span class="cpt-rouge">${n.manquants.slice(0, 30).map(esc).join(', ')}${n.manquants.length > 30 ? '...' : ''}</span>` : '<span class="cpt-vert">aucun, séquence continue</span>'}</td></tr>`).join('')}</tbody></table>` : '<p class="cpt-gris">Aucune facture importée.</p>'}
+      ${M.numeros.length ? `<table class="cpt-table"><thead><tr><th>Série</th><th class="cpt-n">Documents</th><th class="cpt-n">Dernier n°</th><th>Manquants</th></tr></thead><tbody>${M.numeros.map(n => `<tr><td>${esc(n.serie)}</td><td class="cpt-n">${n.n}</td><td class="cpt-n">${n.max}${n.debut > 1 ? `<br><span class="cpt-gris">reprise après le n° ${n.debut - 1}</span>` : ''}</td><td>${n.manquants.length ? `<span class="cpt-rouge">${n.manquants.slice(0, 30).map(esc).join(', ')}${n.manquants.length > 30 ? '...' : ''}</span>` : '<span class="cpt-vert">aucun, séquence continue</span>'}</td></tr>`).join('')}</tbody></table>` : '<p class="cpt-gris">Aucune facture importée.</p>'}
       <h3>Alertes (${al.length})</h3>${al.length ? `<ul class="cpt-liste cpt-rouge">${al.map(a => `<li>${esc(a.txt)}${a.ok ? ` <button class="cpt-btn cpt-sec" data-action="st-ok" data-v="${esc(a.ok)}">J'ai vérifié, cette TVA est normale</button>` : ''}</li>`).join('')}</ul>` : '<p class="cpt-vert">Rien à signaler.</p>'}
       <h3>Informations (${inf.length})</h3>${inf.length ? `<ul class="cpt-liste">${inf.map(a => `<li>${esc(a.txt)}${a.ok ? ` <button class="cpt-btn cpt-sec" data-action="st-ok" data-v="${esc(a.ok)}">J'ai vérifié, cette TVA est normale</button>` : ''}</li>`).join('')}</ul>` : '<p class="cpt-gris">Rien.</p>'}
       <details><summary>Journal des modifications (${D.journal.length})</summary><table class="cpt-table"><tbody>${D.journal.slice().reverse().slice(0, 300).map(j => `<tr><td>${dfr(j.le.slice(0, 10))} ${j.le.slice(11, 16)}</td><td>${esc(j.action)}</td><td>${esc(j.detail)}</td></tr>`).join('')}</tbody></table></details>`;
@@ -5391,6 +5456,7 @@ window.addEventListener('load', () => {
     out.entreprise = Object.assign(nouveauDossier(out.annee).entreprise, d.entreprise || {});
     out.micro = Object.assign(nouveauDossier(out.annee).micro, d.micro || {});
     ['factures', 'encaissements', 'depenses', 'conflits', 'journal'].forEach(k => { if (!Array.isArray(out[k])) out[k] = []; });
+    out.factures.sort(triNumeros);
     out.relance = Object.assign({ delai: 0, ecart: 15 }, d.relance || {});
     ['ventilations', 'livraisons', 'natures', 'verifies', 'relances'].forEach(k => { if (!out[k] || typeof out[k] !== 'object') out[k] = {}; });
     delete out._photosRetirees;
@@ -5467,7 +5533,7 @@ window.addEventListener('load', () => {
     // Dossier choisi depuis l'accueil, avec sa configuration
     ouvrirDossier(obj) {
       if (!obj || obj._type !== 'dossier-compta') return false;
-      if (S.dossier && aSauvegarder() && S.dossier.annee !== obj.annee && !global.confirm('Le dossier ouvert a des modifications non enregistrées. Le remplacer quand même ?')) return false;
+      if (S.dossier && aSauvegarder() && !global.confirm('Le dossier ouvert a des modifications non enregistrées. Le remplacer quand même ?')) return false;
       const ok = ouvrirObjetDossier(obj);
       if (S.root) rendre();
       return ok;
