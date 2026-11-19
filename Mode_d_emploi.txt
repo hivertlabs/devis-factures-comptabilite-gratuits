@@ -173,6 +173,10 @@ qui les rend valables face à lui.
 - ACRE (micro-entreprise) : dans la compta, onglet « Paramètres »,
   indiquez la date de fin et le taux de votre attestation Urssaf : les
   cotisations estimées en tiennent compte.
+- Nouvelle année : à partir de décembre, le tableau de bord de la compta
+  propose « Préparer mon dossier [année suivante] ». Le nouveau dossier
+  reprend vos réglages et les factures pas encore payées. Gardez le
+  fichier de l'année passée : il sert pour ses déclarations.
 - Guides pratiques en ligne : lien « Guides pratiques » en bas de page.
 
 

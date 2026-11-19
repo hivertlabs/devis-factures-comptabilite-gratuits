@@ -366,6 +366,8 @@ table.d-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
 .cpt-split h4 { margin: 0 0 6px; color: var(--cpt-accent); }
 .cpt-split select { max-width: 380px; }
 .cpt-carte.cpt-correction { border-color: #e0b400; background: #fffdf2; }
+.cpt-carte.cpt-annee { border-color: #b6d4fe; background: #f3f8ff; }
+.cpt-carte.cpt-annee p { margin: 6px 0; }
 .cpt-grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px 14px; }
 .cpt-grille label, .cpt-ligne label { display: flex; flex-direction: column; gap: 3px; font-size: .9em; color: #3b4556; }
 .cpt-ligne label { flex-direction: row; align-items: center; gap: 6px; }
@@ -578,6 +580,7 @@ table.d-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
   html.sombre .ag-num, html.sombre .ag-tete, html.sombre .ag-plus, html.sombre .ag-gris { color: #9aa4b2; }
   html.sombre .ag-intervention { background: #132f52; color: #cfe3ff; } html.sombre .ag-rdv { background: #2a1d4d; color: #ddd0ff; } html.sombre .ag-rappel { background: #2d333b; color: #e6edf3; }
   html.sombre .ag-echeance { background: #10261a; color: #7ee2a8; } html.sombre .ag-relance { background: #2d1414; color: #ffb4ab; } html.sombre .ag-devis { background: #2b2111; color: #f2cc60; } html.sombre .ag-assurance { background: #0f2a27; color: #7fe0d2; }
+  html.sombre .cpt-carte.cpt-annee { background: #132238; border-color: #2f5d8f; }
   html.sombre .ag-semaine { background: #132238; border-color: #2f5d8f; color: #cfe3ff; }
   html.sombre .cpt-paire { border-bottom-color: #484f58; }
   html.sombre .cpt-jauge i { background: #30363d; }
@@ -3811,6 +3814,8 @@ window.addEventListener('load', () => {
       if (anneeDe(d.date) !== parseInt(m[2], 10)) al.push({ niv: 'alerte', txt: `${d.numero} : la date (${dfr(d.date)}) n'est pas dans l'année de son numéro.` });
     });
     Object.keys(groupes).sort().forEach(k => {
+      // Séries d'une autre année (factures reprises de l'an passé) : la numérotation se contrôle dans leur propre dossier
+      if (D.reportDe && parseInt(k.split('-').pop(), 10) < A) return;
       const ns = groupes[k].sort((a, b) => a - b);
       const max = ns[ns.length - 1];
       const manquants = [];
@@ -3826,7 +3831,7 @@ window.addEventListener('load', () => {
     });
     M.enc.forEach(k => {
       if (k.orphelin) al.push({ niv: 'alerte', txt: `Encaissement du ${dfr(k.e.date)} rattaché à ${k.e.facture}, facture non importée.` });
-      if (!k.dansAnnee) al.push({ niv: 'info', txt: `Encaissement du ${dfr(k.e.date)} (${k.e.facture}) hors année ${A} : non compté dans ce dossier.` });
+      if (!k.dansAnnee && !(D.reportDe && anneeDe(k.e.date) < A)) al.push({ niv: 'info', txt: `Encaissement du ${dfr(k.e.date)} (${k.e.facture}) hors année ${A} : non compté dans ce dossier.` });
     });
     M.dep.forEach(k => {
       if (!k.dansAnnee) al.push({ niv: 'info', txt: `Dépense du ${dfr(k.d.date)} (${k.d.fournisseur}) hors année ${A}.` });
@@ -3848,6 +3853,7 @@ window.addEventListener('load', () => {
     }
     const imp = M.docs.filter(r => r.racine === r.num && r.type !== 'avoir' && r2((M.comps[r.num] || vide()).ttc - r.encaisse) > 0.009);
     if (imp.length) al.push({ niv: 'info', txt: `${imp.length} facture(s) pas encore entièrement encaissée(s).` });
+    if (D.reportDe && D.reportDe.numeros && D.reportDe.numeros.length) al.push({ niv: 'info', txt: `${D.reportDe.numeros.length} document(s) repris du dossier ${D.reportDe.annee} : leurs montants comptent dans ${D.reportDe.annee}, ici seuls leurs paiements de ${A} comptent.${D.regime === 'micro' ? '' : ` Au réel, votre comptable reprend leurs soldes au 1er janvier ${A} (à-nouveaux) avant d'importer le FEC ${A}.`}` });
     if (!D.entreprise.raisonSociale) al.push({ niv: 'alerte', txt: "Configuration de l'entreprise non chargée : chargez votre fichier de configuration." });
   }
 
@@ -4435,6 +4441,16 @@ window.addEventListener('load', () => {
     return `<div class="cpt-relances"><h3>🔔 ${L.length} facture${L.length > 1 ? 's' : ''} à relancer</h3><ul>${L.slice(0, 8).map(x => `<li><strong>${esc(x.num)}</strong> · ${esc(x.client)} · ${eur(x.reste)} · ${x.retard} j de retard · ${LIB_ETAPE(x.etape)}${x.pen ? ` · pénalités ${eur(x.pen.montant)} + 40 €` : ''}</li>`).join('')}${L.length > 8 ? `<li>et ${L.length - 8} autre(s)</li>` : ''}</ul>
       <button class="cpt-btn cpt-sec" data-action="onglet" data-v="ventes">Voir et noter les relances (Ventes et encaissements)</button></div>`;
   }
+  function carteAnneeSuivante(M) {
+    const D = S.dossier, A = D.annee, j = auj(), y = +j.slice(0, 4), m = +j.slice(5, 7);
+    if (!(y > A || (y === A && m === 12))) return '';
+    const nb = M.docs.filter(r => r.racine === r.num && r.type !== 'avoir' && r2((M.comps[r.num] || vide()).ttc - r.encaisse) > 0.009).length;
+    return `<div class="cpt-carte cpt-annee"><h3>📅 ${y > A ? `L'année ${A} est terminée` : `L'année ${A} se termine`} : préparez votre dossier ${A + 1}</h3>
+      <p>Un dossier par année. Le dossier ${A + 1} reprend vos réglages${nb ? ` et vos <strong>${nb} facture(s) pas encore payée(s)</strong>, pour continuer à suivre leurs paiements et leurs relances` : ''}. Le dossier ${A} ne change pas : gardez son fichier, c'est lui qui sert pour vos déclarations de ${A}.</p>
+      ${y === A ? `<p class="cpt-note">Vous pouvez le faire dès maintenant ou après le 31 décembre. Les factures et dépenses de décembre se notent encore dans le dossier ${A}.</p>` : ''}
+      <button class="cpt-btn" data-action="annee-suivante">📅 Préparer mon dossier ${A + 1}</button></div>`;
+  }
+
   function vueBord(M) {
     const D = S.dossier, a = M.an, micro = D.regime === 'micro';
     // Coût réel d'une dépense : TTC moins la TVA que l'on récupère (en franchise, tout le TTC)
@@ -4482,7 +4498,7 @@ window.addEventListener('load', () => {
       ? [{ lib: 'Encaissé HT', f: x => x.encHT }, { lib: 'Ventes', f: x => x.vente }, { lib: 'Prestations', f: x => r2(x.service + x.bnc) }, { lib: 'Dépenses TTC', f: x => x.depTTC }]
       : [{ lib: 'CA facturé HT', f: x => x.caHT }, { lib: 'Encaissé TTC', f: x => x.encTTC }, { lib: 'TVA collectée', f: x => x.tvaCol }, { lib: 'TVA déductible', f: x => x.tvaDed }, { lib: 'Dépenses TTC', f: x => x.depTTC }];
     if (D.entreprise.franchise && !micro) cols.splice(2, 2);
-    return `${global.agendaSemaineHTML ? global.agendaSemaineHTML() : ''}${encadreRelances(M)}
+    return `${carteAnneeSuivante(M)}${global.agendaSemaineHTML ? global.agendaSemaineHTML() : ''}${encadreRelances(M)}
       <div class="cpt-tuiles">${tuiles.map(t => `<div class="cpt-tuile${t.att ? ' cpt-tuile-att' : ''}${t.pm ? (t.v >= 0 ? ' cpt-tuile-plus' : ' cpt-tuile-moins') : ''}${t.cls ? ' ' + t.cls : ''}"><span>${t.lib}</span><strong>${eur(t.v)}${t.u ? ` <em>${t.u}</em>` : ''}</strong>${t.sous.map(l => `<small class="${l[3] || ''}">${l[0]}${l[1] != null ? ` <b>${eur(l[1])}${l[2] ? ' ' + l[2] : ''}</b>` : ''}</small>`).join('')}</div>`).join('')}</div>
       ${seuilFranchiseHTML(M)}
       <h3>Mon travail est-il payé, et qu'est-ce qu'il me reste ? <span class="cpt-gris">(par mois de facture)</span></h3>
@@ -4930,6 +4946,37 @@ window.addEventListener('load', () => {
     return e;
   }
 
+  /* Passage à l'année suivante : nouveau dossier qui reprend les réglages et les factures pas encore soldées
+   * (avec leurs avoirs, leurs acomptes et leurs encaissements déjà reçus, pour que le reste à encaisser tombe juste).
+   * Les montants de l'année passée ne comptent pas dans le nouveau dossier : seuls les encaissements de la nouvelle année y entrent. */
+  function preparerAnneeSuivante() {
+    const D = S.dossier, A = D.annee, N = A + 1, idx = index(), M = calculer();
+    const resteDe = r => r2((M.comps[r.num] || vide()).ttc - r.encaisse);
+    const racines = new Set(M.docs.filter(r => r.racine === r.num && Math.abs(resteDe(r)) > 0.009).map(r => r.num));
+    // Acomptes encore jamais déduits : la facture de solde viendra peut-être l'an prochain
+    const deduits = new Set();
+    D.factures.forEach(f => (f.deductions || []).forEach(dd => { if (dd.ref) deduits.add(dd.ref); }));
+    D.factures.filter(f => f.docType === 'acompte' && !deduits.has(f.numero)).forEach(f => racines.add(racineDe(f, idx)));
+    const garder = new Set(D.factures.filter(f => racines.has(racineDe(f, idx))).map(f => f.numero));
+    // Acomptes déduits par une facture reprise : on les garde pour que le calcul du solde reste exact
+    D.factures.filter(f => garder.has(f.numero)).forEach(f => (f.deductions || []).forEach(dd => { if (dd.ref && idx[dd.ref]) garder.add(dd.ref); }));
+    const copie = x => JSON.parse(JSON.stringify(x));
+    const n = nouveauDossier(N);
+    n.entreprise = copie(D.entreprise);
+    n.regime = D.regime;
+    n.micro = copie(D.micro);
+    n.relance = copie(D.relance);
+    n.factures = copie(D.factures.filter(f => garder.has(f.numero)));
+    n.encaissements = copie(ecrituresActives(D.encaissements).filter(e => { const r = M.parNum[e.facture]; return garder.has(r ? r.racine : e.facture) || garder.has(e.facture); }));
+    ['natures', 'livraisons', 'ventilations', 'relances'].forEach(k => {
+      Object.keys(D[k] || {}).forEach(num => { if (garder.has(num)) n[k][num] = copie(D[k][num]); });
+    });
+    const aEncaisser = r2([...racines].reduce((s, k) => s + Math.max(0, M.parNum[k] ? resteDe(M.parNum[k]) : 0), 0));
+    n.reportDe = { annee: A, le: maintenant(), numeros: [...garder].sort(), aEncaisser };
+    n.journal = [{ le: n.creeLe, action: 'création', detail: `dossier ${N} préparé depuis le dossier ${A} : ${garder.size} document(s) repris` }];
+    return n;
+  }
+
   function action(nom, el) {
     const D = S.dossier;
     switch (nom) {
@@ -4939,6 +4986,21 @@ window.addEventListener('load', () => {
         if (S.config) appliquerConfig(S.config);
         noter('création', 'dossier ' + a);
         S.onglet = 'bord'; avis([`Dossier ${a} créé. Importez maintenant vos factures (.json).`]);
+        break;
+      }
+      case 'annee-suivante': {
+        if (!D) break;
+        const A = D.annee;
+        if (!global.confirm(`Préparer le dossier ${A + 1} ?\n\nIl reprend vos réglages et les factures de ${A} pas encore payées, pour suivre leurs encaissements et leurs relances. Le dossier ${A} n'est pas modifié${aSauvegarder() ? ' : il va d\'abord être enregistré dans vos Téléchargements' : ''}.`)) break;
+        const sauve = aSauvegarder();
+        if (sauve) action('sauver');
+        const n = preparerAnneeSuivante();
+        S.dossier = n;
+        if (S.config) appliquerConfig(S.config);
+        memoriser();
+        S.onglet = 'bord'; S.ui = {};
+        const nb = n.reportDe.numeros.length;
+        avis([`Dossier ${n.annee} créé. ${nb ? `${nb} document(s) de ${A} repris (${eur(n.reportDe.aEncaisser)} restent à encaisser) : leurs paiements de ${n.annee} se notent ici, comme d'habitude.` : `Toutes vos factures de ${A} sont soldées : rien à reprendre.`} ${sauve ? `Votre dossier ${A} vient d'être enregistré dans vos Téléchargements : gardez-le bien. ` : ''}Cliquez maintenant sur « Enregistrer le dossier » pour créer le fichier ${n.annee}.`]);
         break;
       }
       case 'reprendre': { const m = lireMemoire(); if (m && ouvrirObjetDossier(m)) { S.dossier.exporteLe = m.exporteLe || ''; avis(['Dossier repris depuis la mémoire du navigateur. Enregistrez-le dans un fichier.']); } break; }

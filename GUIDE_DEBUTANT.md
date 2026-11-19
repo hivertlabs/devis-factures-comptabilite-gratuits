@@ -240,6 +240,14 @@ La comptabilité de L'Établi est réservée à la France, et elle s'ouvre quand
 
 **Le bouton « Enregistrer le dossier » devient rouge** tant que des modifications ne sont pas enregistrées dans votre fichier. Pourquoi tant d'insistance : la mémoire du navigateur peut être vidée à tout moment (un nettoyage, une mise à jour, un autre ordinateur). Votre fichier, lui, reste. Prenez l'habitude : vous finissez une saisie, vous enregistrez.
 
+### Au 1er janvier : le dossier de l'année suivante
+
+À partir de décembre, le tableau de bord de la comptabilité affiche une carte « Préparez votre dossier 2027 ». Le bouton « 📅 Préparer mon dossier 2027 » crée le nouveau dossier. Il reprend vos réglages et les factures de l'année qui ne sont pas encore payées, avec leurs acomptes, leurs avoirs et ce que le client a déjà versé. Vous continuez donc à suivre leurs paiements et leurs relances en 2027, sans rien ressaisir.
+
+**Pourquoi un nouveau dossier :** chaque année se déclare à part. Prenez une facture de travaux de décembre 2026, payée en janvier 2027. Au régime réel, elle compte dans le chiffre d'affaires 2026 (date de la facture), mais sa TVA devient due au paiement, donc en 2027. En micro-entreprise, c'est le paiement qui compte : elle entre dans vos recettes 2027. Le nouveau dossier fait ce partage tout seul.
+
+**Gardez bien le fichier de 2026** : c'est lui qui sert pour vos déclarations de 2026. S'il avait des modifications pas encore enregistrées, le logiciel l'enregistre d'abord, avant de préparer 2027. Les factures et les dépenses datées de décembre se notent dans le dossier 2026, même si vous les saisissez en janvier.
+
 ### Un client a payé : l'encaissement
 
 Onglet « 🧾 Ventes et encaissements », bouton « + encaissement » sous la facture. Indiquez le montant, le mode de paiement et **la date où l'argent est arrivé sur votre compte**.

@@ -50,6 +50,7 @@ Un espace **Comptabilité** s'ouvre à côté des devis et des factures :
 - **Une entreprise, un dossier** : le dossier comptable reste attaché à l'entreprise de votre configuration. Si vous gérez deux entreprises, rien ne se mélange.
 - **Franchise de TVA** : le tableau de bord montre où vous en êtes par rapport aux seuils et, au rythme de vos encaissements, vers quelle date vous les atteindriez.
 - **ACRE** : si vous en bénéficiez, les cotisations estimées tiennent compte du taux réduit de votre attestation.
+- **Passage à l'année suivante** : à partir de décembre, un bouton prépare le dossier de l'année suivante. Il reprend vos réglages et les factures pas encore payées (avec leurs acomptes, avoirs et versements déjà reçus), pour continuer à suivre leurs paiements et leurs relances.
 - **Exports** en PDF et en CSV.
 
 La comptabilité applique les règles françaises. Elle n'existe pas encore pour les autres pays. Elle aide à préparer vos déclarations et le travail de votre comptable, elle ne les remplace pas.
