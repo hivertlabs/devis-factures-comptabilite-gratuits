@@ -2511,6 +2511,8 @@ function majVisibiliteConfig() {
     const m = CFG.deplacement.mode;
     const pp = P(), HTd = pp.lbl.ht ? ' ' + pp.lbl.ht : '';
     $('lblPrixDep').textContent = m === 'km' ? `Prix${HTd} par km (${pp.devise})` : m === 'heure' ? `Prix${HTd} par heure (${pp.devise})` : `Prix${HTd} du forfait (${pp.devise})`;
+    // Flèches : d'un euro en un euro pour un forfait ou une heure de trajet, au centime pour un prix au km (0,45 €/km)
+    { const ip = document.querySelector('[data-cfg="deplacement.prix"]'); if (ip) ip.step = m === 'km' ? '0.01' : 'any'; }
 }
 
 function renderTauxUI() {
