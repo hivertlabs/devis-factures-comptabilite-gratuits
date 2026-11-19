@@ -3661,8 +3661,11 @@ window.addEventListener('load', () => {
         const f = c.ttc ? num(dd.montant) / c.ttc : 0;
         const k = vide();
         c.parTaux.forEach(l => ajouterTaux(k, l.taux, r2(l.base * f), r2(l.tva * f)));
-        c = combiner(c, totaliser(k), -1);
-      }
+        totaliser(k);
+        // Écart d'arrondi : la part déduite doit retomber exactement sur le montant de l'acompte
+        const ecart = r2(num(dd.montant) - k.ttc);
+        if (ecart && k.parTaux.length) { const g = k.parTaux.reduce((x, y) => (Math.abs(y.base) > Math.abs(x.base) ? y : x)); g.base = r2(g.base + ecart); totaliser(k); }
+        c = combiner(c, k, -1);      }
     });
     const t = doc.totaux || {};
     if ((doc.deductions || []).length && t.net != null && Math.abs(c.ttc - num(t.net)) > 0.011) msgs.push(`Net recalculé ${eur(c.ttc)} différent du net à payer figé ${eur(t.net)} : À VÉRIFIER.`);
@@ -3882,7 +3885,7 @@ window.addEventListener('load', () => {
     const D = S.dossier, A = D.annee, al = M.alertes;
     const btp = !!(S.config && S.config.assurances && S.config.assurances.decennale && S.config.assurances.decennale.actif);
     // Numérotation : séquence continue par préfixe et par année.
-    const re = /^([A-Za-z]+)-(\d{4})-(\d+)$/;
+    const re = /^(.+)-(\d{4})-(\d+)$/;
     const groupes = {};
     D.factures.forEach(d => {
       const m = re.exec(d.numero || '');
