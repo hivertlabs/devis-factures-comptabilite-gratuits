@@ -1223,7 +1223,7 @@ const PAYS = {
             { t: 2.1, lib: '2,1 %', aide: 'cas très particuliers' }
         ],
         tauxInit: [20, 10, 5.5], defaut: 20, reduits: [10, 5.5],
-        mentionReduit: "Taux de TVA réduit appliqué sous réserve que les travaux portent sur un local d'habitation achevé depuis plus de 2 ans.",
+        mentionReduit: "Le client certifie que les travaux portent sur des locaux à usage d'habitation achevés depuis plus de deux ans et qu'ils ne concourent pas à la production d'un immeuble neuf (art. 279-0 bis du CGI). Pour les lignes à 5,5 % : il certifie en outre qu'il s'agit de travaux d'amélioration de la qualité énergétique (art. 278-0 bis A du CGI). Le client est solidairement tenu au paiement du complément de TVA si ces mentions s'avèrent inexactes de son fait.",
         hintReduit: "Ajoutée automatiquement en bas du devis dès qu'une ligne est à 10 % ou 5,5 %. Adaptez-la à votre cas, ou videz-la pour ne rien afficher.",
         zone: 'France métropolitaine', formeInit: 'micro',
         formes: [
@@ -1409,7 +1409,7 @@ function defaultConfig() {
             decennale: { actif: false, assureur: '', coordonnees: '', contrat: '', zone: 'France métropolitaine', fin: '' },
             rcpro: { actif: false, assureur: '', contrat: '', coordonnees: '', zone: '' }
         },
-        tva: { taux: [20, 10, 5.5], defaut: 20, mentionReduit: "Taux de TVA réduit appliqué sous réserve que les travaux portent sur un local d'habitation achevé depuis plus de 2 ans." },
+        tva: { taux: [20, 10, 5.5], defaut: 20, mentionReduit: "Le client certifie que les travaux portent sur des locaux à usage d'habitation achevés depuis plus de deux ans et qu'ils ne concourent pas à la production d'un immeuble neuf (art. 279-0 bis du CGI). Pour les lignes à 5,5 % : il certifie en outre qu'il s'agit de travaux d'amélioration de la qualité énergétique (art. 278-0 bis A du CGI). Le client est solidairement tenu au paiement du complément de TVA si ces mentions s'avèrent inexactes de son fait." },
         catalogue: [
             { type: 'mo', lib: "Main-d'œuvre", unite: 'h', pu: 50, tva: '' }
         ],
@@ -1455,7 +1455,7 @@ let CFG_A_SAUVER = false;
 const $ = id => document.getElementById(id);
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function nl2br(s) { return esc(s).replace(/\n/g, '<br>'); }
-function r2(n) { return Math.round((n + Number.EPSILON) * 100) / 100; }
+function r2(n) { n = +n || 0; const s = n < 0 ? -1 : 1; return s * Math.round(Math.abs(n) * 100 + 1e-7) / 100; } // symétrique : un avoir retombe au centime sur sa facture
 function num(v) { const n = parseFloat(String(v == null ? '' : v).replace(',', '.')); return isFinite(n) ? n : 0; }
 function fE(n) { return (n || 0).toLocaleString(P().locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + P().devise; }
 function fN(n) { return (n || 0).toLocaleString(P().locale, { maximumFractionDigits: 3 }); }
@@ -1557,9 +1557,18 @@ function tvaParDefaut() { const d = num(CFG.tva.defaut); return CFG.tva.taux.inc
 function estFacture(dv) { return !!dv.docType && dv.docType !== 'devis'; }
 function deductionsDe(dv) { return dv.docType === 'facture' ? (dv.deductions || []).filter(d => num(d.montant) !== 0) : []; }
 function netAPayer(dv, c) { return r2(c.ttc - deductionsDe(dv).reduce((s, d) => s + num(d.montant), 0)); }
+// Réglages figés d'un document émis (ou d'un avoir tiré d'une facture émise) : si la configuration change ensuite
+// (sortie de la franchise, remise dégressive modifiée), la réimpression et l'avoir gardent les montants d'origine.
+function figeDe(dv) { const f = dv && (dv.fige || (dv.emise ? dv.totaux : null)); return f && typeof f.franchise === 'boolean' ? f : null; }
+function cfgDe(dv) {
+    const f = figeDe(dv);
+    if (!f || f.franchise === !!CFG.legal.franchise) return CFG;
+    return Object.assign({}, CFG, { legal: Object.assign({}, CFG.legal, { franchise: f.franchise }) });
+}
 function sansTVA(cfg, dv) { return !!cfg.legal.franchise || (dv.clientType === 'pro' && !!dv.autoliquidation); }
 
 function remiseDegressive(cfg, dv, heuresMO) {
+    const fg = figeDe(dv); if (fg && typeof fg.rDeg === 'number') return fg.rDeg;
     if (!cfg.degressif.actif || !dv.appliquerDegressif) return 0;
     const p = cfg.degressif.paliers.filter(x => num(x.seuil) > 0).sort((a, b) => num(b.seuil) - num(a.seuil));
     for (const x of p) { if (heuresMO >= num(x.seuil)) return Math.min(Math.max(num(x.remise), 0), 100); }
@@ -1730,7 +1739,9 @@ function htmlMentionsTVA(cfg, dv, c) {
     const p = P();
     if (cfg.legal.franchise) { if (p.franchise.mention) m.push(p.franchise.mention); }
     else if (dv.clientType === 'pro' && dv.autoliquidation && p.autoliq) m.push(esc(p.autoliq.mention));
-    if (c.tauxReduit && cfg.tva.mentionReduit && cfg.tva.mentionReduit.trim()) m.push(esc(cfg.tva.mentionReduit));
+    let mr = cfg.tva.mentionReduit || '';
+    if (/^Taux de TVA réduit appliqué sous réserve que les travaux/.test(mr)) mr = P().mentionReduit || mr; // ancienne mention des configurations déjà enregistrées
+    if (c.tauxReduit && mr.trim()) m.push(esc(mr));
     if (estFacture(dv) && p.france) {
         m.push("Nature de l'opération : " + (NATURES[dv.natureOp] || NATURES.services) + '.');
         if (cfg.legal.tvaDebits && !cfg.legal.franchise) m.push("Option pour le paiement de la taxe d'après les débits.");
@@ -1840,6 +1851,7 @@ function devisExemple() {
 function renderDoc() {
     majNomPdf();
     const dv = MODE === 'config' ? devisExemple() : DEV;
+    const CFG = cfgDe(dv); // document émis : réglages du jour de l'émission
     const c = calc(CFG, dv);
     $('doc').style.setProperty('--c', CFG.apparence.couleur || '#003366');
     $('dHeader').innerHTML = htmlHeader(CFG);
@@ -2047,6 +2059,8 @@ function dernierFacture(annee) {
 }
 function noterFacture(annee, n) {
     if (n <= dernierFacture(annee)) return;
+    const ca = lsGet(LS_NUMF) || {}, cb = CFG.numerotation.factures || {};
+    if (num(ca.annee) > annee || num(cb.annee) > annee) return; // facture d'une année passée : le compteur de l'année en cours ne bouge pas
     lsSet(LS_NUMF, { annee, n });
     CFG.numerotation.factures = { annee, n };
     CFG_A_SAUVER = true;
@@ -2092,9 +2106,9 @@ function versFacture(type) {
 }
 function totauxDe(doc) {
     if (doc.totaux && typeof doc.totaux.ttc === 'number') return doc.totaux;
-    const c = calc(CFG, doc);
+    const K = cfgDe(doc), c = calc(K, doc);
     return {
-        v: 2, ht: c.netHT, tva: c.totalTVA, ttc: c.ttc, net: netAPayer(doc, c),
+        v: 2, ht: c.netHT, tva: c.totalTVA, ttc: c.ttc, net: netAPayer(doc, c), franchise: !!K.legal.franchise, rDeg: c.rDeg,
         pays: CFG.pays || 'FR', devise: P().devise, sansTaxe: c.noTva,
         detail: c.detail.map(d => Object.assign({ taux: d.taux, base: d.base, tva: d.tva }, d.parts ? { parts: d.parts } : {}))
     };
@@ -2170,6 +2184,7 @@ function creerAvoir() {
     const f = merge(defaultDevis(), src);
     Object.assign(f, { docType: 'avoir', devisRef: src.numero, devisDate: src.date, date: todayISO(), emise: false, echeance: '', deductions: [], note: '' });
     delete f.emiseLe; delete f.devisSource; delete f.totaux; delete f.acomptePrevu;
+    const fs = figeDe(src); if (fs) f.fige = { franchise: fs.franchise, rDeg: fs.rDeg };
     f.lignes.forEach(l => { if (l.type !== 'titre' && !(l.type === 'supplement' && l.mode === 'pct')) l.pu = -num(l.pu); });
     DEV = f;
     suggererNumeroFacture();
@@ -3081,7 +3096,7 @@ function agendaSemaineHTML() {
 }
 
 /* ----- Export .ics (RFC 5545) ----- */
-function icsTexte(s) { return String(s || '').replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
+function icsTexte(s) { return String(s || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
 function icsPlier(ligne) {
     const enc = new TextEncoder(); let out = '', cur = '', n = 0;
     for (const ch of ligne) {
@@ -3604,7 +3619,7 @@ window.addEventListener('load', () => {
     });
     const t = doc.totaux || {};
     if ((doc.deductions || []).length && t.net != null && Math.abs(c.ttc - num(t.net)) > 0.011) msgs.push(`Net recalculé ${eur(c.ttc)} différent du net à payer figé ${eur(t.net)} : À VÉRIFIER.`);
-    if (doc.docType === 'avoir') c = combiner(vide(), c, -1);
+    if (doc.docType === 'avoir' && c.ttc > 0) c = combiner(vide(), c, -1);  // avoir enregistré en positif ou en négatif : toujours compté en négatif
     return { c, msgs, source: d.source };
   }
 
@@ -4762,7 +4777,7 @@ window.addEventListener('load', () => {
     return `<h3>Montants à déclarer à l'URSSAF (chiffre d'affaires encaissé HT)</h3>
       <table class="cpt-table"><thead><tr><th>Période</th><th class="cpt-n">${P.urssaf.vente.lib}</th><th class="cpt-n">${P.urssaf.service.lib}</th><th class="cpt-n">${P.urssaf.bnc.lib}</th><th class="cpt-n">Cotisations estimées${vl ? ' + versement libératoire' : ''}</th></tr></thead><tbody>${ligPer.join('')}</tbody></table>
       ${D.micro.acre && D.micro.acreFin ? `<p class="cpt-note">ACRE : cotisations à ${esc(D.micro.acreTaux || '50')} % du taux normal pour les périodes qui commencent avant le ${dfr(D.micro.acreFin)} (versement libératoire non réduit).</p>` : ''}
-      <p class="cpt-note">Taux ${params(D.annee).annee} : ventes ${pctTxt(P.urssaf.vente.taux)}, prestations BIC ${pctTxt(P.urssaf.service.taux)}, BNC ${pctTxt(P.urssaf.bnc.taux)}${vl ? `, versement libératoire ${pctTxt(P.urssaf.vente.vl)} / ${pctTxt(P.urssaf.service.vl)} / ${pctTxt(P.urssaf.bnc.vl)}` : ''}. Estimation indicative (${D.micro.acre ? '' : 'hors ACRE, '}hors CIPAV, hors taxes consulaires) : le montant exact est celui calculé par l'URSSAF.
+      <p class="cpt-note">Taux ${params(D.annee).annee} : ventes ${pctTxt(P.urssaf.vente.taux)}, prestations BIC ${pctTxt(P.urssaf.service.taux)}, BNC ${pctTxt(P.urssaf.bnc.taux)}${vl ? `, versement libératoire ${pctTxt(P.urssaf.vente.vl)} / ${pctTxt(P.urssaf.service.vl)} / ${pctTxt(P.urssaf.bnc.vl)}` : ''}. Estimation indicative (${D.micro.acre ? '' : 'hors ACRE, '}hors CIPAV, hors contribution à la formation professionnelle et taxes consulaires) : le montant exact est celui calculé par l'URSSAF.
       ${D.micro.activite === 'mixte' ? '<br>Activité mixte : la part « ventes » vient des lignes « fourniture » de chaque facture. Les textes officiels ne fixent pas de méthode : ajustez le pourcentage dans « Ventes et encaissements » si besoin.' : ''}</p>
       <h3>Livre des recettes ${D.annee}</h3>
       ${recettes.length ? `<table class="cpt-table"><thead><tr><th>Date d'encaissement</th><th>Client</th><th>Pièce</th><th>Mode</th><th>Espèces</th><th class="cpt-n">Montant</th></tr></thead><tbody>${lr}</tbody></table>` : '<p class="cpt-gris">Aucun encaissement saisi.</p>'}
