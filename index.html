@@ -1565,7 +1565,7 @@ function cfgDe(dv) {
     if (!f || f.franchise === !!CFG.legal.franchise) return CFG;
     return Object.assign({}, CFG, { legal: Object.assign({}, CFG.legal, { franchise: f.franchise }) });
 }
-function sansTVA(cfg, dv) { return !!cfg.legal.franchise || (dv.clientType === 'pro' && !!dv.autoliquidation); }
+function sansTVA(cfg, dv) { return !!cfg.legal.franchise || (dv.clientType === 'pro' && !!dv.autoliquidation && !!P().autoliq); }
 
 function remiseDegressive(cfg, dv, heuresMO) {
     const fg = figeDe(dv); if (fg && typeof fg.rDeg === 'number') return fg.rDeg;
@@ -1617,7 +1617,8 @@ function calc(cfg, dv) {
     const totalTVA = r2(detail.reduce((s, d) => s + d.tva, 0));
     const ttc = r2(netHT + totalTVA);
     const acPct = Math.min(Math.max(num(dv.acompte), 0), 100);
-    const acompte = acPct > 0 ? r2(ttc * acPct / 100) : 0;
+    // Même calcul que la facture d'acompte (base de chaque taux, puis sa taxe) : le devis et la facture tombent au centime près
+    const acompte = acPct > 0 ? r2(detail.reduce((s, d) => { const b = r2(d.base * acPct / 100); return s + b + (d.parts ? d.parts.reduce((a, x) => a + r2(b * x.t / 100), 0) : r2(b * d.taux / 100)); }, 0)) : 0;
     const tauxReduit = !noTva && out.some(o => o.l.type !== 'titre' && P().reduits.concat(P().reduits.length ? [] : P().taux.slice(1).map(x => x.t)).includes(o.tva) && o.tva > 0 && o.total > 0);
     return { out, heuresMO, rDeg, totalMO, brut, rem, remiseMontant: r2(brut - netHT), detail, netHT, totalTVA, ttc, acPct, acompte, noTva, tauxReduit };
 }
@@ -1710,7 +1711,7 @@ function htmlTotals(cfg, dv, c) {
     const Lb = P().lbl, HT = Lb.ht ? ' ' + Lb.ht : '';
     if (c.rem > 0) {
         h += row(Lb.ht ? `Total${HT} avant remise` : 'Sous-total avant remise', fE(c.brut));
-        h += row(`Remise ${fN(c.rem)} %`, '- ' + fE(c.remiseMontant));
+        h += row(`Remise ${fN(c.rem)} %`, fE(-c.remiseMontant));
     }
     if (!c.noTva) {
         h += row(Lb.ht ? `Total net${HT}` : 'Sous-total', fE(c.netHT), 't-strong');
@@ -2055,14 +2056,15 @@ function memoriserNumero() {
 // Dernier numéro de facture connu pour une année : le plus grand entre ce navigateur et le fichier de configuration
 function dernierFacture(annee) {
     const a = lsGet(LS_NUMF) || {}, b = CFG.numerotation.factures || {};
-    return Math.max(a.annee === annee ? num(a.n) : 0, b.annee === annee ? num(b.n) : 0);
+    let c = 0; try { if (window.LetabliCompta && LetabliCompta.dernierEmis) c = LetabliCompta.dernierEmis(annee); } catch (e) { }
+    return Math.max(a.annee === annee ? num(a.n) : 0, b.annee === annee ? num(b.n) : 0, c);
 }
-function noterFacture(annee, n) {
-    if (n <= dernierFacture(annee)) return;
+function noterFacture(annee, n, date) {
     const ca = lsGet(LS_NUMF) || {}, cb = CFG.numerotation.factures || {};
+    if (n <= Math.max(ca.annee === annee ? num(ca.n) : 0, cb.annee === annee ? num(cb.n) : 0)) return;
     if (num(ca.annee) > annee || num(cb.annee) > annee) return; // facture d'une année passée : le compteur de l'année en cours ne bouge pas
-    lsSet(LS_NUMF, { annee, n });
-    CFG.numerotation.factures = { annee, n };
+    lsSet(LS_NUMF, { annee, n, date: date || '' });
+    CFG.numerotation.factures = { annee, n, date: date || '' };
     CFG_A_SAUVER = true;
     $('noticeCfgTxt').textContent = '💾 Votre compteur de factures a avancé. Téléchargez votre configuration à jour : la numérotation reprendra au bon endroit, même sur un autre ordinateur.';
     $('noticeCfg').classList.remove('hidden');
@@ -2239,6 +2241,7 @@ function majVisibiliteDevis() {
     $('lblNumero').textContent = D.lblNum;
     $('lblRef').textContent = t === 'avoir' ? "Facture d'origine" : (p.docs.devis ? 'Soumission de référence' : 'Devis de référence');
     $('fsDoc').disabled = emise;
+    document.querySelector('[data-dev="demo"]').disabled = emise;
     let hn = '';
     if (fac && !emise && !DEV.demo) {
         const an = (seqNumero(DEV.numero) || {}).annee || new Date().getFullYear(), der = dernierFacture(an);
@@ -2308,13 +2311,13 @@ function majAlertes(c) {
 /* ----- Impression et émission ----- */
 /* ----- Soutien : rappel au 3e devis imprimé, au 10e, puis tous les 30 ----- */
 function palierSuivant(n) { return n < 3 ? 3 : n < 10 ? 10 : 10 + 30 * (Math.floor((n - 10) / 30) + 1); }
-function etatDon() { const e = lsGet(LS_DON) || {}; return { vus: Array.isArray(e.vus) ? e.vus : [], prochain: num(e.prochain) || 3, pause: e.pause || '' }; }
+function etatDon() { const e = lsGet(LS_DON) || {}; return { vus: Array.isArray(e.vus) ? e.vus : [], prochain: num(e.prochain) || 3, pause: e.pause || '', base: num(e.base) }; }
 function compterDevisPourDon() {
     if (estFacture(DEV) || DEV.demo || !DEV.numero) return false;
     const e = etatDon();
     if (e.vus.includes(DEV.numero)) return false;          // un même devis réimprimé ne compte qu'une fois
     e.vus.push(DEV.numero);
-    if (e.vus.length > 400) e.vus = e.vus.slice(-400);
+    if (e.vus.length > 400) { e.base = (e.base || 0) + e.vus.length - 400; e.vus = e.vus.slice(-400); }
     const n = e.vus.length + (e.base || 0);
     let montrer = false;
     if (n >= e.prochain) {
@@ -2353,10 +2356,12 @@ function emettreFacture() {
     if (!s) { alert(`Le numéro doit se terminer par l'année et un numéro d'ordre, par exemple ${CFG.numerotation.prefixeFacture || 'F'}-${new Date().getFullYear()}-001.`); return; }
     const dernier = dernierFacture(s.annee);
     let msg = '';
-    if (s.n <= dernier) msg += `ATTENTION : le numéro ${DEV.numero} a déjà été utilisé ou est antérieur au dernier numéro émis (${pad3(dernier)}). Deux factures ne doivent jamais porter le même numéro.\n\n`;
-    else if (s.n > dernier + 1) msg += `ATTENTION : ce numéro laisserait un trou dans la numérotation (dernier numéro émis : ${pad3(dernier)}).\n\n`;
+    if (s.n <= dernier) { alert(`Émission impossible : le numéro ${DEV.numero} a déjà été utilisé ou est antérieur au dernier numéro émis (${pad3(dernier)}). Deux factures ne doivent jamais porter le même numéro.\n\nCliquez sur « +1 » à côté du numéro pour reprendre le numéro suivant.`); return; }
+    if (s.n > dernier + 1) msg += `ATTENTION : ce numéro laisserait un trou dans la numérotation (dernier numéro émis : ${pad3(dernier)}).\n\n`;
     if (dernier === 0 && s.n === 1) msg += `Aucune facture émise connue en ${s.annee}. Si vous en avez déjà émis cette année (autre ordinateur, autre logiciel), annulez et ouvrez d'abord votre dernière facture .json : le compteur se remettra à jour.\n\n`;
     else if (s.n === dernier + 1) msg += `Dernière facture émise : n° ${pad3(dernier)}.\n\n`;
+    const derDate = [lsGet(LS_NUMF) || {}, CFG.numerotation.factures || {}].filter(x => x.annee === s.annee && x.date).map(x => x.date).sort().pop() || '';
+    if (derDate && DEV.date < derDate) msg += `ATTENTION : la date de ce document (${fD(DEV.date)}) est antérieure à celle de la dernière facture émise (${fD(derDate)}). Les factures doivent se suivre dans l'ordre des dates.\n\n`;
     const a = alertesDevis(calc(CFG, DEV));
     if (a.length) msg += 'Points à vérifier :\n- ' + a.join('\n- ') + '\n\n';
     msg += `Émettre ${D.un} n° ${DEV.numero} ?\n\nUne fois émis, ce document ne se modifie plus et ne se supprime pas` + (DEV.docType === 'avoir' ? '.' : ' : une erreur se corrige par un avoir.') + '\nSon fichier .json va être téléchargé : gardez-le dans vos archives.';
@@ -2364,7 +2369,7 @@ function emettreFacture() {
     DEV.emise = true;
     DEV.emiseLe = new Date().toISOString();
     delete DEV.totaux; DEV.totaux = totauxDe(DEV); // montants figés à l'émission
-    noterFacture(s.annee, s.n);
+    noterFacture(s.annee, s.n, DEV.date);
     const fichier = sauverDevis();
     if (window.LetabliCompta && fichier) LetabliCompta.factureEmise(fichier);
     majVisibiliteDevis(); renderEditeur(); renderDoc(); sauverPlusTard();
@@ -2685,7 +2690,8 @@ function initConfigForm() {
     });
     $('selTauxDefaut').addEventListener('change', e => { CFG.tva.defaut = num(e.target.value); onCfg(); });
     $('inDernFac').addEventListener('change', e => {
-        const an = new Date().getFullYear(), n = Math.max(0, Math.floor(num(e.target.value)));
+        const an = new Date().getFullYear(), n = Math.max(0, Math.floor(num(e.target.value))), connu = dernierFacture(an);
+        if (n < connu && !confirm(`La facture n° ${pad3(connu)} a déjà été émise en ${an}. Revenir à ${pad3(n)} ferait réutiliser des numéros déjà émis, ce qui est interdit.\n\nNe confirmez que pour corriger une erreur de saisie de ce compteur. Confirmer ?`)) { e.target.value = connu; return; }
         lsSet(LS_NUMF, { annee: an, n }); CFG.numerotation.factures = { annee: an, n };
         onCfg();
     });
@@ -2822,7 +2828,7 @@ function majAccueil() {
     if (c) b.textContent = '↩️ Reprendre : ' + (c.entreprise && c.entreprise.raisonSociale ? c.entreprise.raisonSociale : 'ma configuration');
 }
 function allerAccueil() { setMode('accueil'); }
-function creerConfig() { CFG = defaultConfig(); DEV = defaultDevis(); STEP = 0; setMode('config'); sauverPlusTard(); }
+function creerConfig() { if (REMEMBER && lsGet(LS_CFG) && !confirm('Une configuration est gardée dans ce navigateur. En créer une nouvelle la remplacera ici (votre fichier .json, lui, ne change pas). Continuer ?')) return; CFG = defaultConfig(); DEV = defaultDevis(); STEP = 0; setMode('config'); sauverPlusTard(); }
 function reprendreConfig() {
     const c = lsGet(LS_CFG); if (!c) return;
     CFG = merge(defaultConfig(), c);
@@ -2938,7 +2944,7 @@ function agRegrouper(ev, iso) {
 }
 function agPuce(e) {
     const t = AG_TYPES[e.type] || AG_TYPES.rappel;
-    return `<button class="ag-puce ag-${esc(e.type)}" onclick="agOuvrir('${esc(e.uid)}')" title="${esc(t.lib + ' : ' + e.titre)}">${t.ico} ${e.heure ? esc(e.heure) + ' ' : ''}${esc(e.titre)}</button>`;
+    return `<button class="ag-puce ag-${esc(e.type)}" onclick="agOuvrir(${esc(JSON.stringify(e.uid))})" title="${esc(t.lib + ' : ' + e.titre)}">${t.ico} ${e.heure ? esc(e.heure) + ' ' : ''}${esc(e.titre)}</button>`;
 }
 
 function renderAgenda() {
@@ -2962,7 +2968,7 @@ function renderAgenda() {
     const liste = jours.length ? jours.map(g => `<div class="ag-jour"><div class="ag-jour-t">${g.j === auj ? "Aujourd'hui" : g.j === addDays(auj, 1) ? 'Demain' : agJourLong(g.j)}</div>${g.ev.map(e => {
         const t = AG_TYPES[e.type] || AG_TYPES.rappel, plusJ = e.fin > e.debut ? ` <span class="ag-gris">(jusqu'au ${agJourLong(e.fin)})</span>` : '';
         const det = [e.client, e.lieu, e.devis && e.type !== 'devis' ? 'devis ' + e.devis : ''].filter(Boolean).map(esc).join(' · ');
-        return `<div class="ag-ligne ag-${esc(e.type)}" onclick="agOuvrir('${esc(e.uid)}')"><span class="ag-ico">${t.ico}</span><div><b>${e.heure ? esc(e.heure) + ' · ' : ''}${esc(e.titre)}</b>${plusJ}${det ? `<br><span class="ag-gris">${det}</span>` : ''}</div></div>`;
+        return `<div class="ag-ligne ag-${esc(e.type)}" onclick="agOuvrir(${esc(JSON.stringify(e.uid))})"><span class="ag-ico">${t.ico}</span><div><b>${e.heure ? esc(e.heure) + ' · ' : ''}${esc(e.titre)}</b>${plusJ}${det ? `<br><span class="ag-gris">${det}</span>` : ''}</div></div>`;
     }).join('')}</div>`).join('') : '<p class="ag-gris">Rien de prévu dans les 60 prochains jours.</p>';
 
     box.innerHTML = `
@@ -3013,7 +3019,7 @@ function agOuvrir(uid) {
 function agFormulaire() {
     const e = AG.edit, t = AG_TYPES[e.type] || AG_TYPES.rappel;
     if (e.lectureSeule) {
-        const actions = e.type === 'devis' ? `<button class="btn btn-light btn-small" onclick="agRetirerDevis('${esc(e.devis)}')">Le client a répondu : retirer</button>`
+        const actions = e.type === 'devis' ? `<button class="btn btn-light btn-small" onclick="agRetirerDevis(${esc(JSON.stringify(e.devis))})">Le client a répondu : retirer</button>`
             : (e.type === 'relance' || e.type === 'echeance') ? `<button class="btn btn-light btn-small" onclick="AG.edit=null; setMode('compta')">Voir dans la comptabilité</button>`
             : `<button class="btn btn-light btn-small" onclick="AG.edit=null; setMode('config'); allerEtape(3)">Modifier dans la configuration</button>`;
         return `<div class="ag-form" id="agForm"><h3>${t.ico} ${esc(t.lib)}</h3><p><b>${esc(e.titre)}</b> : ${agJourLong(e.debut)}</p>${e.client ? `<p>${esc(e.client)}</p>` : ''}${e.note ? `<p class="ag-gris">${esc(e.note)}</p>` : ''}
@@ -3234,7 +3240,7 @@ $('fileDevis').addEventListener('change', e => {
         if (data._type !== 'devis') { alert("Ce fichier n'est pas un devis ou une facture enregistré avec ce générateur."); return; }
         DEV = merge(defaultDevis(), data);
         delete DEV.entreprise; delete DEV.enregistreLe;
-        if (estFacture(DEV) && DEV.emise) { const q = seqNumero(DEV.numero); if (q) noterFacture(q.annee, q.n); }
+        if (estFacture(DEV) && DEV.emise) { const q = seqNumero(DEV.numero); if (q) noterFacture(q.annee, q.n, DEV.date); }
         rafraichirSaisie();
     });
     e.target.value = '';
@@ -3243,6 +3249,7 @@ $('fileDevis').addEventListener('change', e => {
 /* =====================================================================
    DÉMARRAGE
    ===================================================================== */
+window.addEventListener('beforeunload', e => { if (CFG_A_SAUVER) { e.preventDefault(); e.returnValue = ''; } });
 window.addEventListener('load', () => {
     REMEMBER = lsGet(LS_REM) === true;
     initConfigForm();
@@ -3508,7 +3515,8 @@ window.addEventListener('load', () => {
     if (!TYPES_DOC[t]) return `${fichier} : type « ${esc(t)} » inconnu, ignoré.`;
     if (!obj.emise) return `${fichier} : facture non émise (brouillon), ignorée.`;
     if (!obj.numero) return `${fichier} : facture sans numéro, ignorée.`;
-    if (D.entreprise.raisonSociale && obj.entreprise && obj.entreprise !== D.entreprise.raisonSociale) {
+    const sansEI = x => nomNorm(String(x || '').replace(/\s+EI$/i, ''));
+    if (D.entreprise.raisonSociale && obj.entreprise && sansEI(obj.entreprise) !== sansEI(D.entreprise.raisonSociale)) {
       return `${fichier} : facture de « ${esc(obj.entreprise)} », pas de « ${esc(D.entreprise.raisonSociale)} ». Ignorée.`;
     }
     const exist = D.factures.find(f => f.numero === obj.numero);
@@ -4045,7 +4053,8 @@ window.addEventListener('load', () => {
     const cx = plusLongue(colOk, w, 2); if (!cx) return null;
     const lw = cx[1] - cx[0] + 1;
     const ligOk = y => { let c = 0; for (let x = cx[0]; x <= cx[1]; x++) c += clair[y * w + x]; return c > 0.4 * lw; };
-    const cy = plusLongue(ligOk, h, Math.max(2, Math.round(0.06 * h))); // une pliure ou une ombre ne coupe pas le ticket en deux if (!cy) return null;
+    const cy = plusLongue(ligOk, h, Math.max(2, Math.round(0.06 * h))); // une pliure ou une ombre ne coupe pas le ticket en deux
+    if (!cy) return null;
     const lh = cy[1] - cy[0] + 1, part = (lw * lh) / (w * h);
     if (part > 0.85 || part < 0.08 || lw < 0.12 * w || lh < 0.12 * h) return null;
     return { x: cx[0] / w, y: cy[0] / h, l: lw / w, h: lh / h };
@@ -5433,14 +5442,16 @@ window.addEventListener('load', () => {
     // Appelé par L'Établi quand une facture vient d'être émise : elle rejoint le dossier ouvert de la même année.
     factureEmise(obj) {
       if (!S.dossier || enConflit() || !obj || !obj.emise || obj.demo || !TYPES_DOC[obj.docType] || anneeDe(obj.date) !== S.dossier.annee) return false;
-      if (S.dossier.factures.some(f => f.numero === obj.numero)) return false;
-      const copie = JSON.parse(JSON.stringify(obj));
-      importerObjet(copie, obj.numero + '.json');
-      S.avis = [`${TYPES_DOC[obj.docType]} ${esc(obj.numero)} ajoutée automatiquement à votre comptabilité ${S.dossier.annee}. Pensez à enregistrer le dossier.`];
+      const avant = S.dossier.factures.length;
+      const msg = importerObjet(JSON.parse(JSON.stringify(obj)), obj.numero + '.json');
+      const ok = S.dossier.factures.length > avant;
+      S.avis = [ok ? `${TYPES_DOC[obj.docType]} ${esc(obj.numero)} ajoutée automatiquement à votre comptabilité ${S.dossier.annee}. Pensez à enregistrer le dossier.` : msg];
       if (S.root) rendre();
-      return true;
+      return ok;
     },
     dossierOuvert() { return S.dossier ? S.dossier.annee : null; },
+    // Plus grand numéro de facture d'une année déjà présent dans le dossier ouvert (garde-fou de la numérotation)
+    dernierEmis(annee) { let m = 0; if (S.dossier) S.dossier.factures.forEach(f => { const x = /-(\d{4})-(\d+)$/.exec(f.numero || ''); if (x && +x[1] === annee) m = Math.max(m, +x[2]); }); return m; },
     // Pour l'agenda : échéances à venir et relances (prévues ou à faire aujourd'hui) des factures non soldées
     evenementsAgenda() {
       if (!S.dossier) return [];
