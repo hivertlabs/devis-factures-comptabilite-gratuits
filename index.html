@@ -734,8 +734,48 @@ html:not(.sombre) .btn-theme { background: #e2e8f0; color: #003366; }
   }
   html.sombre .pays-btn:not(.active) { box-shadow: 0 1px 2px rgba(0,0,0,.5); }
   html.sombre .pays-btn.active { background: #0f1c2e; box-shadow: inset 0 2px 7px rgba(0,0,0,.68); }
+  /* ===== Mode clair façon calculateur orbital : fond gris perle, cartes blanches posées dessus, champs enfoncés =====
+     (le mode sombre et l'aperçu du document ne sont pas touchés) */
+  html:not(.sombre), html:not(.sombre) body { background: #DFE2E8; }
+  html:not(.sombre) { --filet: #E1E4EA; --ombre: 0 0 0 1px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.08); }
+  html:not(.sombre) .panel { border-color: transparent; box-shadow: var(--ombre); }
+  html:not(.sombre) .btn-theme { background: #FFFFFF; box-shadow: var(--ombre); }
+  html:not(.sombre) .espaces { background: #D3D7DE; border-color: transparent; box-shadow: inset 0 1px 3px rgba(0,0,0,.12); }
+  html:not(.sombre) .tab:not(.active), html:not(.sombre) .cpt-onglets button:not(.cpt-actif), html:not(.sombre) .btn-light, html:not(.sombre) .cpt-btn.cpt-sec { background: #DFE2E8; }
+  html:not(.sombre) .tab:not(.active):hover, html:not(.sombre) .cpt-onglets button:not(.cpt-actif):hover, html:not(.sombre) .btn-light:hover, html:not(.sombre) .cpt-btn.cpt-sec:hover { background: #D3D7DE; }
+  html:not(.sombre) :is(.panel, .cpt) :is(input:is([type=text],[type=number],[type=date],[type=time],[type=email]), select, textarea):not(.cpt-ocr):not(.cpt-acat):not(.cpt-manque):not(.cpt-date-imp):not(:disabled):not(#doc *) {
+    background: #DFE2E8; border-color: transparent; box-shadow: inset 0 1px 2px rgba(0,0,0,.10), inset 0 0 0 1px rgba(0,0,0,.06);
+  }
+  html:not(.sombre) :is(.panel, .cpt) :is(input, select, textarea):focus:not(.cpt-ocr):not(.cpt-acat):not(.cpt-manque):not(.cpt-date-imp):not(#doc *) {
+    background: #FFFFFF; border-color: #003366; box-shadow: var(--anneau);
+  }
+  /* ===== Boutons enclenchables animés : celui qu'on choisit s'enfonce, l'ancien remonte (environ 0,25 s) =====
+     Les ombres ont le même nombre de couches dans les deux états pour que le navigateur puisse glisser de l'un à l'autre,
+     et le dégradé sombre du bouton enfoncé est posé sur une couche à part qui apparaît en fondu. */
+  .esp, .tab, .cpt-onglets button, .pays-btn { position: relative; isolation: isolate;
+    transition: background-color .26s cubic-bezier(.3,.7,.2,1), color .22s ease, box-shadow .26s cubic-bezier(.3,.7,.2,1), transform .26s cubic-bezier(.3,.7,.2,1), border-color .22s ease; }
+  .esp::before, .tab::before, .cpt-onglets button::before { content: ''; position: absolute; inset: 0; border-radius: inherit; z-index: -1; pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 60%); opacity: 0; transition: opacity .26s ease; }
+  .esp.active::before, .tab.active::before, .cpt-onglets button.cpt-actif::before { opacity: 1; }
+  .pr-gel::before { transition: none !important; }
+  .esp:not(.active) { box-shadow: 0 1px 2px rgba(15,23,42,.14), inset 0 3px 8px rgba(0,0,0,0), inset 0 1px 0 rgba(255,255,255,.8); }
+  .tab:not(.active), .cpt-onglets button:not(.cpt-actif) { box-shadow: 0 1px 1px rgba(15,23,42,.12), inset 0 3px 8px rgba(0,0,0,0), inset 0 1px 0 rgba(255,255,255,.6); }
+  .esp.active, .esp.active:hover, .tab.active, .cpt-onglets button.cpt-actif {
+    background: #003366; box-shadow: 0 0 0 rgba(15,23,42,0), inset 0 3px 8px rgba(0,0,0,.56), inset 0 -1px 0 rgba(255,255,255,.10);
+  }
+  .pays-btn:not(.active) { box-shadow: 0 1px 2px rgba(15,23,42,.10), inset 0 2px 6px rgba(0,51,102,0); }
+  .pays-btn.active { box-shadow: 0 0 0 rgba(15,23,42,0), inset 0 2px 6px rgba(0,51,102,.32); }
+  .esp:active, .tab:active, .cpt-onglets button:active, .pays-btn:active { transform: translateY(2px) scale(.97); transition-duration: .08s; }
+  html.sombre .esp:not(.active) { box-shadow: 0 1px 2px rgba(0,0,0,.6), inset 0 3px 9px rgba(0,0,0,0), inset 0 1px 0 rgba(255,255,255,.05); }
+  html.sombre .tab:not(.active), html.sombre .cpt-onglets button:not(.cpt-actif) { box-shadow: 0 1px 1px rgba(0,0,0,.5), inset 0 3px 9px rgba(0,0,0,0), inset 0 1px 0 rgba(255,255,255,.06); }
+  html.sombre .esp.active, html.sombre .esp.active:hover, html.sombre .tab.active, html.sombre .cpt-onglets button.cpt-actif {
+    background: #2f5d8f; box-shadow: 0 0 0 rgba(0,0,0,0), inset 0 3px 9px rgba(0,0,0,.73), inset 0 -1px 0 rgba(255,255,255,.08);
+  }
+  html.sombre .pays-btn:not(.active) { box-shadow: 0 1px 2px rgba(0,0,0,.5), inset 0 2px 7px rgba(0,0,0,0); }
+  html.sombre .pays-btn.active { box-shadow: 0 0 0 rgba(0,0,0,0), inset 0 2px 7px rgba(0,0,0,.68); }
 }
 @media (prefers-reduced-motion: reduce) {
+  .pays-btn, .esp::before, .tab::before, .cpt-onglets button::before { transition: none !important; }
   .btn, .cpt-btn, .esp, .tab, .cpt-onglets button, .ed-act button, .btn-x, .ag-ligne { transition: none !important; }
   .btn:hover, .cpt-btn:hover, .btn:active, .cpt-btn:active { transform: none !important; }
 }
@@ -5620,6 +5660,45 @@ window.addEventListener('load', () => {
         <div class="don-pied">Le don se fait sur PayPal, dans un nouvel onglet. L'Établi ne voit jamais vos informations de paiement.</div>
     </div>
 </div>
+<script>
+/* Animation des boutons enclenchables redessinés à chaque clic (étapes de la configuration, choix du pays, onglets de la compta) :
+   juste après le nouveau dessin, chaque bouton repart une fraction de seconde de son ancien état, puis glisse vers le nouveau */
+(function () {
+  var GROUPES = [['#tabs', '.tab', 'active'], ['#paysRow', '.pays-btn', 'active'], ['.cpt-onglets', 'button', 'cpt-actif']];
+  document.addEventListener('click', function (ev) {
+    for (var g = 0; g < GROUPES.length; g++) {
+      var cont = GROUPES[g][0], sel = GROUPES[g][1], cls = GROUPES[g][2];
+      var b = ev.target.closest ? ev.target.closest(cont + ' ' + sel) : null;
+      if (!b) continue;
+      var avant = Array.prototype.slice.call(document.querySelectorAll(cont + ' ' + sel)).findIndex(function (x) { return x.classList.contains(cls); });
+      // Le nouveau dessin peut arriver un peu après le clic (compta, fenêtre de confirmation du pays) : on guette jusqu'à 20 images
+      var essai = function (k) {
+        var nb = Array.prototype.slice.call(document.querySelectorAll(cont + ' ' + sel));
+        var neuf = nb.findIndex(function (x) { return x.classList.contains(cls); });
+        if (neuf < 0 || neuf === avant) { if (k < 20) requestAnimationFrame(function () { essai(k + 1); }); return; }
+        var n = nb[neuf], a = avant >= 0 ? nb[avant] : null;
+        if (!n.animate || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+        // On lit l'ancien aspect de chaque bouton (classe inversée le temps de la lecture, rien n'est dessiné), puis on part de là
+        var lire = function (el) { var c = getComputedStyle(el); return { offset: 0, backgroundColor: c.backgroundColor, color: c.color, boxShadow: c.boxShadow, transform: c.transform, borderColor: c.borderColor }; };
+        var lireFond = function (el) { return getComputedStyle(el, '::before').opacity; };
+        var gel = function (on) { [n, a].forEach(function (el) { if (el) { el.style.transition = on ? 'none' : ''; el.classList.toggle('pr-gel', on); } }); };
+        gel(true);   // sans transition pendant la lecture, sinon on lirait l'état d'arrivée
+        n.classList.remove(cls); if (a) a.classList.add(cls);
+        var deN = lire(n), fN = lireFond(n), deA = a ? lire(a) : null, fA = a ? lireFond(a) : null;
+        n.classList.add(cls); if (a) a.classList.remove(cls);
+        void n.offsetWidth; gel(false);
+        var o = { duration: 260, easing: 'cubic-bezier(.3,.7,.2,1)' }, oF = { duration: 260, easing: 'ease', pseudoElement: '::before' };
+        try {
+          n.animate([deN], o); if (a) a.animate([deA], o);
+          n.animate([{ offset: 0, opacity: fN }], oF); if (a) a.animate([{ offset: 0, opacity: fA }], oF);
+        } catch (e) { }
+      };
+      requestAnimationFrame(function () { essai(0); });
+      return;
+    }
+  }, true);
+})();
+</script>
 <script>if (location.protocol !== 'file:') document.getElementById('lienTelecharger').classList.remove('hidden'); else { const g = document.querySelector('a[href="guides/"]'); if (g) g.href = 'https://hivertlabs.github.io/devis-factures-comptabilite-gratuits/guides/'; }</script>
 <script>/* ocr/tesseract-core.js */
 var TesseractCore=(()=>{var _scriptName=typeof document!="undefined"?document.currentScript?.src:undefined;return async function(moduleArg={}){var moduleRtn;var e=moduleArg,aa="object"==typeof window,ba="undefined"!=typeof WorkerGlobalScope,ca="object"==typeof process&&process.versions?.node&&"renderer"!=process.type,da="./this.program",ea=(a,b)=>{throw b;};"undefined"!=typeof __filename?_scriptName=__filename:ba&&(_scriptName=self.location.href);var fa,ha;
