@@ -1204,6 +1204,7 @@ const LS_NUM = 'gdv_numero_v1';
 const LS_REM = 'gdv_remember_v1';
 const LS_NUMF = 'gdv_numero_facture_v1';
 const LS_DON = 'gdv_don_v1';
+const LS_NUMA = 'gdv_numero_anterieur_v1';
 const LIEN_DON = 'https://paypal.me/HivertLabs';
 
 /* =====================================================================
@@ -1494,7 +1495,7 @@ function merge(base, src) {
     return out;
 }
 
-function lsSet(k, v) { if (!REMEMBER && k !== LS_REM && k !== LS_NUM && k !== LS_NUMF && k !== LS_DON) return; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* stockage indisponible : sans importance */ } }
+function lsSet(k, v) { if (!REMEMBER && k !== LS_REM && k !== LS_NUM && k !== LS_NUMF && k !== LS_DON && k !== LS_NUMA) return; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* stockage indisponible : sans importance */ } }
 function lsGet(k) { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
 function lsDel(k) { try { localStorage.removeItem(k); } catch (e) { } }
 
@@ -2066,12 +2067,25 @@ function memoriserNumero() {
 function dernierFacture(annee) {
     const a = lsGet(LS_NUMF) || {}, b = CFG.numerotation.factures || {};
     let c = 0; try { if (window.LetabliCompta && LetabliCompta.dernierEmis) c = LetabliCompta.dernierEmis(annee); } catch (e) { }
-    return Math.max(a.annee === annee ? num(a.n) : 0, b.annee === annee ? num(b.n) : 0, c);
+    const ant = Math.max(num((lsGet(LS_NUMA) || {})[annee]), num((CFG.numerotation.anterieures || {})[annee]));
+    return Math.max(a.annee === annee ? num(a.n) : 0, b.annee === annee ? num(b.n) : 0, c, ant);
 }
 function noterFacture(annee, n, date) {
     const ca = lsGet(LS_NUMF) || {}, cb = CFG.numerotation.factures || {};
     if (n <= Math.max(ca.annee === annee ? num(ca.n) : 0, cb.annee === annee ? num(cb.n) : 0)) return;
-    if (num(ca.annee) > annee || num(cb.annee) > annee) return; // facture d'une année passée : le compteur de l'année en cours ne bouge pas
+    if (num(ca.annee) > annee || num(cb.annee) > annee) { // facture d'une année passée : compteur à part, celui de l'année en cours ne bouge pas
+        const la = lsGet(LS_NUMA) || {}, ant = CFG.numerotation.anterieures = CFG.numerotation.anterieures || {};
+        if (n > num(la[annee])) { la[annee] = n; lsSet(LS_NUMA, la); }
+        if (n > num(ant[annee])) { ant[annee] = n; CFG_A_SAUVER = true; $('noticeCfg').classList.remove('hidden'); sauverPlusTard(); }
+        return;
+    }
+    // Changement d'année : le compteur de l'année qui se termine est rangé à part (facture de décembre émise en janvier)
+    const fini = [ca, cb].filter(x => num(x.annee) && num(x.annee) < annee && num(x.n) > 0);
+    if (fini.length) {
+        const la = lsGet(LS_NUMA) || {}, ant = CFG.numerotation.anterieures = CFG.numerotation.anterieures || {};
+        fini.forEach(x => { const y = num(x.annee); if (num(x.n) > num(la[y])) la[y] = num(x.n); if (num(x.n) > num(ant[y])) ant[y] = num(x.n); });
+        lsSet(LS_NUMA, la);
+    }
     lsSet(LS_NUMF, { annee, n, date: date || '' });
     CFG.numerotation.factures = { annee, n, date: date || '' };
     CFG_A_SAUVER = true;
@@ -3217,10 +3231,13 @@ let titreAvant = document.title;
 window.addEventListener('beforeprint', () => {
     titreAvant = document.title;
     if (MODE === 'devis') { document.title = nomPdf(); memoriserNumero(); agNoterDevis(); }
+    // Facture imprimée sans passer par « Émettre » (Ctrl+P) : elle sort en spécimen, jamais comme une vraie facture
+    if (MODE === 'devis' && estFacture(DEV) && !DEV.emise && !DEV.demo) $('doc').classList.add('demo');
     document.querySelectorAll('.cli-fields input').forEach(inp => inp.classList.toggle('empty-field-print', !inp.value || !inp.value.trim()));
 });
 window.addEventListener('afterprint', () => {
     document.title = titreAvant;
+    $('doc').classList.toggle('demo', MODE === 'devis' && !!DEV.demo);
     document.querySelectorAll('.cli-fields input').forEach(inp => inp.classList.remove('empty-field-print'));
 });
 
@@ -3966,7 +3983,7 @@ window.addEventListener('load', () => {
       return L; } },
     achats: { lib: 'Registre des achats / dépenses', f: M => {
       const L = [['Date', 'Pièce', 'N° facture fournisseur', 'Fournisseur', 'Nature', 'Catégorie', 'Montant TTC', 'TVA', 'TVA déductible', 'TVA autoliquidée', 'Mode', 'Espèces', 'Justificatif']];
-      M.dep.filter(k => k.dansAnnee).forEach(k => L.push([dfr(k.d.date), k.d.piece, k.d.ref || '', k.d.fournisseur, k.d.lib || '', libCat(k.d), num(k.d.ttc), k.t.total, k.t.deductible, k.t.autoliq, MODES[k.d.mode] || k.d.mode, k.d.mode === 'especes' ? 'oui' : 'non', k.d.pdf ? 'PDF' : k.d.photo ? 'photo' : 'non']));
+      M.dep.filter(k => k.dansAnnee).forEach(k => L.push([dfr(k.d.date), k.d.piece, k.d.ref || '', k.d.fournisseur, k.d.lib || '', libCat(k.d), num(k.d.ttc), k.t.total, k.t.deductible, k.t.autoliq || 0, MODES[k.d.mode] || k.d.mode, k.d.mode === 'especes' ? 'oui' : 'non', k.d.pdf ? 'PDF' : k.d.photo ? 'photo' : 'non']));
       return L; } },
     ventes: { lib: 'Journal des ventes', f: M => {
       const L = [['Date', 'Numéro', 'Type', 'Client', 'HT', 'TVA', 'TTC', 'Exigibilité TVA', 'Encaissé', 'Reste dû']];
@@ -5162,6 +5179,9 @@ window.addEventListener('load', () => {
           if (!global.confirm(`Vous indiquez un encaissement le ${dfr(date)}, avant la date de la facture d'acompte (${dfr(fac.date)}). C'est possible seulement si le client a versé l'acompte avant que vous fassiez la facture. Confirmez-vous cette date ?`)) break;
         }
         if (!montant) { errEnc('Montant à zéro : indiquez le montant reçu.'); break; }
+        { const M0 = calculer(), r0 = M0.parNum[el.dataset.num], rac0 = r0 && M0.parNum[r0.racine];
+          const reste0 = rac0 ? r2((M0.comps[r0.racine] || vide()).ttc - rac0.encaisse) : null;
+          if (reste0 != null && montant > 0 && montant > reste0 + 0.009 && !global.confirm(`Vous saisissez ${eur(montant)}, alors qu'il ne reste que ${eur(Math.max(0, reste0))} à encaisser sur cette facture.\n\nC'est une faute de frappe ? Annulez et corrigez le montant.\nLe client a vraiment trop payé ? Confirmez : le trop-perçu sera signalé.`)) break; }
         D.encaissements.push({ id: uid(), facture: el.dataset.num, date, montant, mode: g('cpt-enc-mode'), note: g('cpt-enc-note').trim(), saisiLe: maintenant() });
         noter('encaissement', `${el.dataset.num} ${nfr(montant)} le ${date}`);
         S.ui.encForm = null; S.ui.encDraft = null; S.ui.encErr = '';
@@ -5322,8 +5342,15 @@ window.addEventListener('load', () => {
         break;
       }
       case 'voir-photo': {
-        if (el.dataset.src === 'ui') S.ui.photo = (S.ui.dep || {}).photo;
-        else { const d = D.depenses.find(x => x.id === el.dataset.id); S.ui.photo = d ? d.photo : ''; }
+        const src = el.dataset.src === 'ui' ? (S.ui.dep || {}) : (D.depenses.find(x => x.id === el.dataset.id) || {});
+        // Facture reçue en PDF : on ouvre l'original, net et zoomable, plutôt que l'aperçu en image
+        if (src.pdf) {
+          const bin = atob(src.pdf.split(',')[1]), u = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+          global.open(URL.createObjectURL(new Blob([u], { type: 'application/pdf' })), '_blank');
+          return;
+        }
+        S.ui.photo = src.photo || '';
         break;
       }
       case 'fermer-photo': S.ui.photo = ''; break;
@@ -5449,7 +5476,30 @@ window.addEventListener('load', () => {
       }
       default: return;
     }
+    rendreDiffere();
+  }
+
+  /* Un changement de case (fin de saisie) redessine le module. Fait tout de suite, il détruirait la case où
+   * l'artisan vient de cliquer (frappe perdue) ou le bouton sur lequel il appuie (clic avalé). On attend donc
+   * la fin du clic, puis on redessine en remettant le curseur dans la même case. */
+  function rendreDiffere() {
+    if (S.sourisBas) { S.renduEnAttente = true; return; }
+    setTimeout(rendreGardeFocus, 0);
+  }
+  function rendreGardeFocus() {
+    const R = S.root, a = document.activeElement;
+    let cle = null;
+    if (R && a && a !== R && R.contains(a)) {
+      const cls = Array.from(a.classList || []).find(c => /^cpt-[ds]-/.test(c));
+      cle = { id: a.id, cls, i: cls ? Array.from(R.querySelectorAll('.' + cls)).indexOf(a) : -1, val: a.value, deb: a.selectionStart, fin: a.selectionEnd };
+    }
     rendre();
+    if (!cle) return;
+    const b = cle.id ? R.querySelector('#' + cle.id) : cle.cls && cle.i >= 0 ? R.querySelectorAll('.' + cle.cls)[cle.i] : null;
+    if (!b) return;
+    if (b.tagName === 'INPUT' && cle.val != null && b.value !== cle.val) b.value = cle.val;
+    b.focus();
+    try { if (cle.deb != null) b.setSelectionRange(cle.deb, cle.fin); } catch (e) { /* case sans curseur (date, liste) */ }
   }
 
   // Compatibilité des futurs formats de dossier.
@@ -5479,6 +5529,12 @@ window.addEventListener('load', () => {
       const t = ev.target.closest('[data-action]');
       if (t && el.contains(t)) { ev.preventDefault(); action(t.dataset.action, t); }
     });
+    el.addEventListener('mousedown', () => { S.sourisBas = true; }, true);
+    global.addEventListener('mouseup', () => {
+      if (!S.sourisBas) return;
+      S.sourisBas = false;
+      if (S.renduEnAttente) { S.renduEnAttente = false; setTimeout(rendreGardeFocus, 0); }
+    }, true);
     el.addEventListener('change', ev => {
       const t = ev.target.closest('[data-change]');
       if (t && el.contains(t)) changement(t.dataset.change, t);
@@ -5564,7 +5620,7 @@ window.addEventListener('load', () => {
         <div class="don-pied">Le don se fait sur PayPal, dans un nouvel onglet. L'Établi ne voit jamais vos informations de paiement.</div>
     </div>
 </div>
-<script>if (location.protocol !== 'file:') document.getElementById('lienTelecharger').classList.remove('hidden');</script>
+<script>if (location.protocol !== 'file:') document.getElementById('lienTelecharger').classList.remove('hidden'); else { const g = document.querySelector('a[href="guides/"]'); if (g) g.href = 'https://hivertlabs.github.io/devis-factures-comptabilite-gratuits/guides/'; }</script>
 <script>/* ocr/tesseract-core.js */
 var TesseractCore=(()=>{var _scriptName=typeof document!="undefined"?document.currentScript?.src:undefined;return async function(moduleArg={}){var moduleRtn;var e=moduleArg,aa="object"==typeof window,ba="undefined"!=typeof WorkerGlobalScope,ca="object"==typeof process&&process.versions?.node&&"renderer"!=process.type,da="./this.program",ea=(a,b)=>{throw b;};"undefined"!=typeof __filename?_scriptName=__filename:ba&&(_scriptName=self.location.href);var fa,ha;
 if(ca){var fs=require("fs");ha=a=>{a=ia(a)?new URL(a):a;return fs.readFileSync(a)};fa=async a=>{a=ia(a)?new URL(a):a;return fs.readFileSync(a,void 0)};1<process.argv.length&&(da=process.argv[1].replace(/\\/g,"/"));process.argv.slice(2);ea=(a,b)=>{process.exitCode=a;throw b;}}else if(aa||ba){try{new URL(".",_scriptName)}catch{}ba&&(ha=a=>{var b=new XMLHttpRequest;b.open("GET",a,!1);b.responseType="arraybuffer";b.send(null);return new Uint8Array(b.response)});fa=async a=>{if(ia(a))return new Promise((c,
@@ -6236,7 +6292,7 @@ self.LETABLI_OCR_FRA="H4sICDRv42QAA2ZyYS50cmFpbmVkZGF0YQDM/YWXJMeVB4wmV2YWM2Mz0z
   /* ---------- Texte d'un PDF natif, remis en lignes ---------- */
   async function texteDePage(page) {
     const tc = await page.getTextContent();
-    const items = tc.items.filter(i => i.str && i.str.trim()).map(i => ({ x: i.transform[4], y: i.transform[5], s: i.str, w: i.width || 0 }));
+    const items = tc.items.filter(i => i.str && i.str.trim()).map(i => ({ x: i.transform[4], y: i.transform[5], s: i.str, w: i.width || 0, h: Math.abs(i.transform[3]) || Math.abs(i.transform[0]) || 10 }));
     items.sort((a, b) => b.y - a.y || a.x - b.x);
     const lignes = [];
     items.forEach(it => {
@@ -6244,7 +6300,10 @@ self.LETABLI_OCR_FRA="H4sICDRv42QAA2ZyYS50cmFpbmVkZGF0YQDM/YWXJMeVB4wmV2YWM2Mz0z
       if (l) l.items.push(it); else lignes.push({ y: it.y, items: [it] });
     });
     lignes.sort((a, b) => b.y - a.y);
-    return lignes.map(L => L.items.sort((a, b) => a.x - b.x).map(i => i.s.trim()).join(' ')).join('\n');
+    // Morceaux collés quand ils se touchent (lettres d'un même mot), espace seulement s'il y a un vrai blanc entre eux
+    return lignes.map(L => { let s = '', fin = null;
+      L.items.sort((a, b) => a.x - b.x).forEach(i => { if (fin !== null && i.x - fin > 0.15 * i.h) s += ' '; s += i.s; fin = i.x + i.w; });
+      return s.replace(/\s+/g, ' ').trim(); }).join('\n');
   }
 
   async function dessinerPage(page, max) {
